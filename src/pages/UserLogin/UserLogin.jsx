@@ -1,126 +1,155 @@
 /* eslint react/no-string-refs:0 */
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Input, Button, Checkbox, Grid } from '@icedesign/base';
+import { withRouter, Link } from 'react-router-dom';
+import { Input, Button, Checkbox, Grid, Feedback } from '@icedesign/base';
 import {
-  FormBinderWrapper as IceFormBinderWrapper,
-  FormBinder as IceFormBinder,
-  FormError as IceFormError,
+    FormBinderWrapper as IceFormBinderWrapper,
+    FormBinder as IceFormBinder,
+    FormError as IceFormError,
 } from '@icedesign/form-binder';
 import IceIcon from '@icedesign/icon';
-
+import { inject, observer } from 'mobx-react';
+import { async } from 'q';
 
 const { Row, Col } = Grid;
 
+@inject('stores')
+@observer
+@withRouter
 class UserLogin extends Component {
-  static displayName = 'UserLogin';
+    static displayName = 'UserLogin';
 
-  static propTypes = {};
+    static propTypes = {};
 
-  static defaultProps = {};
+    static defaultProps = {};
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: {
-        username: '',
-        password: '',
-        checkbox: false,
-      },
+    constructor(props) {
+        super(props);
+        this.state = {
+            value: {
+                username: '',
+                password: '',
+                checkbox: false,
+            },
+        };
+    }
+
+    formChange = (value) => {
+        this.setState({
+            value,
+        });
     };
-  }
 
-  formChange = (value) => {
-    this.setState({
-      value,
-    });
-  };
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.refs.form.validateAll(async (errors, values) => {
+            if (errors) {
+                console.log('errors', errors);
+                return;
+            }
+            await this.props.stores.userStore.userLogin(values);
+            this.props.history.push('/');
+        });
+    };
 
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.refs.form.validateAll((errors, values) => {
-      if (errors) {
-        console.log('errors', errors);
-        return;
-      }
-      this.props.userLogin(values);
-    });
-  };
-
-  render() {
-    return (
-      <div className="user-login">
-        <div className="formContainer">
-          <h4 className="formTitle">登 录</h4>
-          <IceFormBinderWrapper
-            value={this.state.value}
-            onChange={this.formChange}
-            ref="form"
-          >
-            <div className="formItems">
-              <Row className="formItem">
-                <Col className="formItemCol">
-                  <IceIcon type="person" size="small" className="inputIcon" />
-                  <IceFormBinder name="username" required message="必填">
-                    <Input size="large" maxLength={20} placeholder="用户名" />
-                  </IceFormBinder>
-                </Col>
-                <Col>
-                  <IceFormError name="username" />
-                </Col>
-              </Row>
-
-              <Row className="formItem">
-                <Col className="formItemCol">
-                  <IceIcon type="lock" size="small" className="inputIcon" />
-                  <IceFormBinder name="password" required message="必填">
-                    <Input
-                      size="large"
-                      htmlType="password"
-                      placeholder="密码"
-                    />
-                  </IceFormBinder>
-                </Col>
-                <Col>
-                  <IceFormError name="password" />
-                </Col>
-              </Row>
-
-              <Row className="formItem">
-                <Col>
-                  <IceFormBinder name="checkbox">
-                    <Checkbox className="checkbox">记住账号</Checkbox>
-                  </IceFormBinder>
-                </Col>
-              </Row>
-
-              <Row className="formItem">
-                <Button
-                  type="primary"
-                  onClick={this.handleSubmit}
-                  className="submitBtn"
+    render() {
+        return (
+            <div style={styles.container}>
+                <h4 style={styles.title}>登 录</h4>
+                <IceFormBinderWrapper
+                    value={this.state.value}
+                    onChange={this.formChange}
+                    ref="form"
                 >
-                  登 录
-                </Button>
-                <p className="account">
-                  <span className="tips-text" style={{ marginRight: '20px' }}>
-                    管理员登录：admin/admin
-                  </span>
-                  <span className="tips-text">用户登录：user/user</span>
-                </p>
-              </Row>
+                    <div style={styles.formItems}>
+                        <div style={styles.formItem}>
+                            <IceIcon type="person" size="small" style={styles.inputIcon} />
+                            <IceFormBinder name="username" required message="必填">
+                                <Input
+                                    size="large"
+                                    maxLength={20}
+                                    placeholder="用户名"
+                                    style={styles.inputCol}
+                                />
+                            </IceFormBinder>
+                            <IceFormError name="username" />
+                        </div>
 
-              <Row className="tips">
-                <Link to="/user/register" className="tips-text">
-                  立即注册
-                </Link>
-              </Row>
+                        <div style={styles.formItem}>
+                            <IceIcon type="lock" size="small" style={styles.inputIcon} />
+                            <IceFormBinder name="password" required message="必填">
+                                <Input
+                                    size="large"
+                                    htmlType="password"
+                                    placeholder="密码"
+                                    style={styles.inputCol}
+                                />
+                            </IceFormBinder>
+                            <IceFormError name="password" />
+                        </div>
+
+                        <div style={styles.formItem}>
+                            <IceFormBinder name="checkbox">
+                                <Checkbox style={styles.checkbox}>记住账号</Checkbox>
+                            </IceFormBinder>
+                        </div>
+
+                        <div style={styles.footer}>
+                            <Button
+                                type="primary"
+                                size="large"
+                                onClick={this.handleSubmit}
+                                style={styles.submitBtn}
+                            >
+                                登 录
+                            </Button>
+                            <Link to="/user/register" style={styles.tips}>
+                                立即注册
+                            </Link>
+                        </div>
+                    </div>
+                </IceFormBinderWrapper>
             </div>
-          </IceFormBinderWrapper>
-        </div>
-      </div>
-    );
-  }
+        );
+    }
 }
+
+const styles = {
+    container: {
+        width: '400px',
+        padding: '40px',
+        background: '#fff',
+        borderRadius: '6px',
+    },
+    title: {
+        margin: '0 0 40px',
+        color: 'rgba(0, 0, 0, 0.8)',
+        fontSize: '28px',
+        fontWeight: '500',
+        textAlign: 'center',
+    },
+    formItem: {
+        position: 'relative',
+        marginBottom: '20px',
+    },
+    inputIcon: {
+        position: 'absolute',
+        left: '10px',
+        top: '8px',
+        color: '#666',
+    },
+    inputCol: {
+        width: '100%',
+        paddingLeft: '20px',
+    },
+    submitBtn: {
+        width: '100%',
+    },
+    tips: {
+        marginTop: '20px',
+        display: 'block',
+        textAlign: 'center',
+    },
+};
 
 export default UserLogin;

@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+.tree-card-list {
+    flex: 0 0 300px;
+    height: 100%;
+    width: 300px;
+
+    .operate-btns {
+        display: none;
+    }
+
+  .tree-card-item {
+
+        &:hover {
+            background-color: #f6f6f6;
+
+            .operate-btns {
+                display: inline-block;
+            }
+        }
+    }
+
+    .api-item-list {
+        padding-left: 10px;
+    }
+
+    .api-item {
+        display: flex;
+        justify-content: space-between;
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+        color: #666;
+        cursor: pointer;
+        padding: 0 10px;
+
+        &:hover {
+            background-color: #f6f6f6;
+
+            .operate-btns {
+                display: inline-block;
+            }
+        }
+    }
+
+  .container-block {
+      margin-left: 0;
+  }
+}
