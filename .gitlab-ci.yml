@@ -1,0 +1,14 @@
+variables:
+  # Please edit to your GitLab project
+  REPO_NAME: ioa-dashboard
+
+before_script:
+  - export SSHPASS='ipar$1000'
+
+build:
+  image: node:10-alpine
+  script:
+    - apk add --update --no-cache make openssh sshpass git
+    - yarn
+    - CI=false npm run build
+    - sshpass -e scp -o stricthostkeychecking=no -P 1607 -r build/* drone@ideapar.com:~/$REPO_NAME/build
