@@ -25,7 +25,7 @@ class MainRoutes extends Component {
                 {routerData.map(this.renderNormalRoute)}
 
                 {/* 根路由默认重定向到 /api */}
-                <Redirect from="/" to="/api" />
+                <Redirect from="/" to="/interface" />
 
                 {/* 未匹配到的路由重定向到 NotFound */}
                 <Route component={NotFound} />

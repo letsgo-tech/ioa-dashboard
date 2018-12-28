@@ -9,7 +9,6 @@ import {
 } from '@icedesign/form-binder';
 import IceIcon from '@icedesign/icon';
 import { inject, observer } from 'mobx-react';
-import { async } from 'q';
 
 const { Row, Col } = Grid;
 

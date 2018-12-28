@@ -21,7 +21,7 @@ const headerMenuConfig = [
 const asideMenuConfig = [
     {
         name: '\u63A5\u53E3',
-        path: '/api',
+        path: '/interface',
         icon: 'home',
     },
 ];
