@@ -1,22 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
-
-
 // 载入默认全局样式 normalize 、.clearfix 和一些 mixin 方法等
 import '@icedesign/base/reset.scss';
 
+import { Provider } from 'mobx-react';
+import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
+import { Router } from 'react-router-dom';
+import { createHashHistory } from 'history';
+
 import router from './router';
+import stores from './store';
+
+const hashHistory = createHashHistory();
+const routerStore = new RouterStore();
+
+const history = syncHistoryWithStore(hashHistory, routerStore);
 
 const ICE_CONTAINER = document.getElementById('ice-container');
 
 if (!ICE_CONTAINER) {
-  throw new Error('当前页面不存在 <div id="ice-container"></div> 节点.');
+    throw new Error('当前页面不存在 <div id="ice-container"></div> 节点.');
 }
 
 ReactDOM.render(
-  <Router>
-    <div>{router()}</div>
-  </Router>,
-  ICE_CONTAINER,
+    <Provider stores={stores}>
+        <Router history={history}>
+            { router() }
+        </Router>
+    </Provider>,
+    ICE_CONTAINER
 );
