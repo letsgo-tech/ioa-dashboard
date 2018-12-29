@@ -1,5 +1,11 @@
 import { observable, action } from 'mobx';
-import { listApiGroups, fetchApiGroup, createApiGroup, deleteApiGroup } from '../api/interface';
+import {
+    listApiGroups,
+    fetchApiGroup,
+    createApiGroup,
+    deleteApiGroup,
+    createApi,
+} from '../api/interface';
 
 export default class ApiStore {
     @observable apiGroups = [];
@@ -51,6 +57,25 @@ export default class ApiStore {
             }
         } else {
             throw new Error('删除失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async createApi(params) {
+        const res = await createApi(params);
+        if (res.status === 200) {
+            if (!(this.currentGroup.apis instanceof Array)) {
+                this.currentGroup.apis = [];
+            }
+            this.currentGroup.apis.push(res.data);
+            for (let i = 0; i < this.apiGroups.length; i++) {
+                if (this.apiGroups[i].id === this.currentGroup.id) {
+                    this.apiGroups[i].apis.push(res.data);
+                    return;
+                }
+            }
+        } else {
+            throw new Error('创建接口失败， 请稍后重试');
         }
     }
 }

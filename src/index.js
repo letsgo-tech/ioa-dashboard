@@ -8,6 +8,7 @@ import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { Router } from 'react-router-dom';
 import { createHashHistory } from 'history';
 
+import './index.scss';
 import router from './router';
 import stores from './store';
 

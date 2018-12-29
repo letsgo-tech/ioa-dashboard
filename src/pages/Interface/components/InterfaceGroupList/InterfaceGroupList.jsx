@@ -113,7 +113,9 @@ export default class InterfaceGroupList extends Component {
                     await this.props.stores.apiStore.createApiGroup(values);
                     this.setState({ isCreating: false, visible: false });
                     Feedback.toast.success('创建分组成功');
+                    this.setState({ value: { name: '', describe: '' } });
                 } catch (error) {
+                    this.setState({ isCreating: false });
                     Feedback.toast.error('创建失败， 请稍后重试');
                 }
             }
@@ -187,7 +189,7 @@ export default class InterfaceGroupList extends Component {
                 <IceContainer>
                     <div style={styles.firstRow}>
                         <span>接口列表</span>
-                        <Button type="primary" ref="target" onClick={() => this.setState({ visible: true })}>
+                        <Button type="primary" ref="target" size="small" onClick={() => this.setState({ visible: true })}>
                             新增分组
                         </Button>
                         { this.renderOverlay() }
