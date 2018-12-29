@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import IceContainer from '@icedesign/container';
 import { Grid } from '@icedesign/base';
-import './ApiDetail.scss';
+import './InterfaceDetail.scss';
 
 const { Row, Col } = Grid;
 
@@ -27,8 +26,8 @@ const dataSource = {
     ],
 };
 
-export default class ApiDetail extends Component {
-    static displayName = 'ApiDetail';
+export default class InterfaceDetail extends Component {
+    static displayName = 'InterfaceDetail';
 
     static propTypes = {};
 
@@ -41,7 +40,7 @@ export default class ApiDetail extends Component {
 
     render() {
         return (
-            <IceContainer>
+            <div>
                 <h2 style={styles.basicDetailTitle}>基础详情页</h2>
 
                 <div style={styles.infoColumn}>
@@ -113,7 +112,7 @@ export default class ApiDetail extends Component {
                         </Col>
                     </Row>
                 </div>
-            </IceContainer>
+            </div>
         );
     }
 }

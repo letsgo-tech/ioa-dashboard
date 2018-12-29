@@ -1,6 +1,6 @@
 import UserLogin from './pages/UserLogin';
 import UserRegister from './pages/UserRegister';
-import Api from './pages/Api';
+import Interface from './pages/Interface';
 import BaseLayout from './layouts/BaseLayout';
 
 const routerConfig = [
@@ -13,9 +13,9 @@ const routerConfig = [
         component: UserRegister,
     },
     {
-        path: '/api',
+        path: '/interface',
         layout: BaseLayout,
-        component: Api,
+        component: Interface,
     },
 ];
 

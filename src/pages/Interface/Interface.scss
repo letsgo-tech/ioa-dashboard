@@ -1,0 +1,13 @@
+.interface-page {
+    display: flex;
+    flex-direction: row;
+
+    .detail-container {
+        background-color: white;
+        border-radius: 6px;
+        flex: 1;
+        margin-left: 20px;
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+}
