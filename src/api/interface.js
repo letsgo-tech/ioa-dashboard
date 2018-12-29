@@ -34,3 +34,13 @@ export async function createApi(params) {
     const res = await request.post('/apis', params);
     return res;
 }
+
+export async function deleteApi(id) {
+    const res = await request.delete(`/apis/${id}`);
+    return res;
+}
+
+export async function patchApi(id, params) {
+    const res = await request.patch(`/apis/${id}`, params);
+    return res;
+}

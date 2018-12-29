@@ -5,6 +5,8 @@ import {
     createApiGroup,
     deleteApiGroup,
     createApi,
+    deleteApi,
+    patchApi,
 } from '../api/interface';
 
 export default class ApiStore {
@@ -76,6 +78,49 @@ export default class ApiStore {
             }
         } else {
             throw new Error('创建接口失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async deleteApi(groupId, apiId) {
+        const res = await deleteApi(apiId);
+        if (res.status === 200) {
+            for (let i = 0; i < this.apiGroups.length; i++) {
+                const group = this.apiGroups[i];
+                if (group.id === groupId) {
+                    this.removeApiFromGroup(group, apiId);
+                }
+            }
+        } else {
+            throw new Error('删除失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async changeGroup(apiId, cgId, tgId) {
+        const res = await patchApi(apiId, { apiGroupId: tgId });
+        if (res.status === 200) {
+            let cg;
+            let tg;
+            for (let i = 0; i < this.apiGroups.length; i++) {
+                const group = this.apiGroups[i];
+                if (group.id === cgId) cg = group;
+                if (group.id === tgId) tg = group;
+            }
+
+            tg.apis.push(this.removeApiFromGroup(cg, apiId));
+        } else {
+            throw new Error('操作失败， 请稍后重试');
+        }
+    }
+
+    removeApiFromGroup(group, apiId) {
+        if (group.apis instanceof Array) {
+            for (let i = 0; i < group.apis.length; i++) {
+                if (group.apis[i].id === apiId) {
+                    return group.apis.splice(i, 1)[0];
+                }
+            }
         }
     }
 }
