@@ -6,6 +6,7 @@ import IceContainer from '@icedesign/container';
 import FoundationSymbol from '@icedesign/foundation-symbol';
 
 import { inject, observer } from 'mobx-react';
+import { computed } from 'mobx';
 import { Link } from 'react-router-dom';
 import './InterfaceGroupList.scss';
 
@@ -21,6 +22,7 @@ export default class InterfaceGroupList extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            searchStr: '',
             visible: false,
             isCreating: false,
             value: {
@@ -40,7 +42,30 @@ export default class InterfaceGroupList extends Component {
     componentWillUnmount() { }
 
     onSearchChange(value) {
-        console.log(value);
+        this.setState({ searchStr: value });
+    }
+
+    @computed
+    get getApiGroups() {
+        const { apiGroups } = this.props.stores.apiStore;
+        const { searchStr } = this.state;
+        if (!searchStr) return apiGroups;
+        const groups = [];
+        apiGroups.forEach(item => {
+            if (item.name.indexOf(searchStr) > -1) {
+                return groups.push(item);
+            }
+
+            if (!(item.apis instanceof Array)) return;
+
+            const apis = item.apis.filter(api => {
+                return api.name.indexOf(searchStr) > -1;
+            });
+
+            if (apis.length) return groups.push(Object.assign({}, item, { apis }));
+        });
+
+        return groups;
     }
 
     deleteApiGroup = async (id) => {
@@ -52,15 +77,24 @@ export default class InterfaceGroupList extends Component {
         }
     }
 
+    deleteApi = async (groupId, apiId) => {
+        try {
+            await this.props.stores.apiStore.deleteApi(groupId, apiId);
+            Feedback.toast.success('删除接口成功');
+        } catch (e) {
+            Feedback.toast.error(e);
+        }
+    }
+
     renderItem = (item, idx) => {
-        const openState = this.state[`item-${idx}`];
+        const openState = this.state[`${item.id}`] || !!this.state.searchStr;
         return (
             <div key={idx}>
                 <Link
                     to={`/interface/group/${item.id}`}
                     style={styles.treeCardItem}
                     className="tree-card-item"
-                    onClick={() => this.setState({ [`item-${idx}`]: !openState })}
+                    onClick={() => this.setState({ [`${item.id}`]: !openState })}
                 >
                     <span style={styles.tab}>{item.name}</span>
                     <span className="operate-btns">
@@ -78,25 +112,33 @@ export default class InterfaceGroupList extends Component {
                 </Link>
                 {
                     openState && item.apis ?
-                        <ul className="api-item-list">
+                        <div className="api-item-list">
                             {item.apis.map((api, index) => {
                                 return (
-                                    <li
+                                    <Link
                                         className="api-item"
                                         key={index}
+                                        to={`/interface/api/${api.id}`}
                                     >
-                                        <Link to={`/interface/api/${api.id}`}>
+                                        <span>
                                             {api.name}
-                                        </Link>
+                                        </span>
                                         <span className="operate-btns">
-                                            <span>
+                                            <span onClick={() => {
+                                                Dialog.confirm({
+                                                    title: `是否删除该接口：${api.name}`,
+                                                    content: '删除后将无法恢复',
+                                                    onOk: () => this.deleteApi(item.id, api.id),
+                                                });
+                                            }}
+                                            >
                                                 <FoundationSymbol type="delete" size="small" />
                                             </span>
                                         </span>
-                                    </li>
+                                    </Link>
                                 );
                             })}
-                        </ul> :
+                        </div> :
                         ''
                 }
             </div>
@@ -183,7 +225,6 @@ export default class InterfaceGroupList extends Component {
     }
 
     render() {
-        const { apiStore } = this.props.stores;
         return (
             <div className="tree-card-list" style={styles.InterfaceGroupList}>
                 <IceContainer>
@@ -199,7 +240,7 @@ export default class InterfaceGroupList extends Component {
                         placeholder="搜索接口"
                         onChange={val => this.onSearchChange(val)}
                     />
-                    {apiStore.apiGroups.map(this.renderItem)}
+                    {this.getApiGroups.map(this.renderItem)}
                 </IceContainer>
             </div>
         );

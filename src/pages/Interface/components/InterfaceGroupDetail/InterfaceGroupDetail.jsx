@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Dialog, Select } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Feedback, Dialog, Tag, Select, Table } from '@icedesign/base';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 import { inject, observer } from 'mobx-react';
+import { computed } from 'mobx';
 import './InterfaceGroupDetail.scss';
 
 const methods = [
@@ -14,6 +15,17 @@ const methods = [
     { label: 'HEAD', value: 'head' },
     { label: 'CONNECT', value: 'connect' },
 ];
+
+const methodColor = {
+    get: '#cfefdf',
+    post: '#d2eafb',
+    delete: '#fcdbd9',
+    patch: '#fff3cf',
+    put: '#fff3cf',
+    option: '#ffa178',
+    head: '#e5e5e5',
+    connect: '#a7a7a7',
+};
 
 @inject('stores')
 @observer
@@ -50,9 +62,21 @@ export default class InterfaceGroupDetail extends Component {
         }
     }
 
+    @computed
+    get apiStore() {
+        return this.props.stores.apiStore;
+    }
+
+    @computed
+    get groups() {
+        return this.apiStore.apiGroups.map(item => {
+            return { label: item.name, value: item.id };
+        });
+    }
+
     async fetchApiGroup(id) {
         try {
-            await this.props.stores.apiStore.fetchApiGroup(id);
+            await this.apiStore.fetchApiGroup(id);
         } catch (e) {
             Feedback.toast.error(e || '获取分组失败');
         }
@@ -155,6 +179,36 @@ export default class InterfaceGroupDetail extends Component {
         );
     }
 
+    methodCellRender = (val, index, record) => {
+        const { method, path } = record;
+        return (
+            <div>
+                <Tag shape="readonly" size="medium" style={{ backgroundColor: methodColor[method], color: '#666' }}>{ method }</Tag>
+                <span>  { path }</span>
+            </div>
+        );
+    }
+
+    groupRender = (val, index, record) => {
+        const { id: apiId } = record;
+        const { id: currentGroupId } = this.apiStore.currentGroup;
+        return (
+            <div>
+                <Select
+                    dataSource={this.groups}
+                    defaultValue={currentGroupId}
+                    onChange={async val => {
+                        try {
+                            this.apiStore.changeGroup(apiId, currentGroupId, val);
+                        } catch (e) {
+                            Feedback.toast.error(e || '操作失败');
+                        }
+                    }}
+                />
+            </div>
+        );
+    }
+
     render() {
         const { currentGroup } = this.props.stores.apiStore;
         return (
@@ -163,6 +217,15 @@ export default class InterfaceGroupDetail extends Component {
                     <h2>{ currentGroup.name } { currentGroup.api ? `共(${currentGroup.api.length})个` : '' }</h2>
                     <Button type="primary" onClick={() => this.setState({ visible: true })}>添加接口</Button>
                     { this.renderOverlay() }
+                </div>
+                <div>
+                    <Table dataSource={currentGroup.apis}>
+                        <Table.Column title="接口名称" dataIndex="name" />
+                        <Table.Column title="接口路径" cell={this.methodCellRender} />
+                        {
+                            this.apiStore.apiGroups.length && <Table.Column title="接口组别" cell={this.groupRender} />
+                        }
+                    </Table>
                 </div>
             </div>
         );
