@@ -29,3 +29,8 @@ export async function putApiGroup(id, params) {
     const res = await request.put(`/apiGroups/${id}`, params);
     return res;
 }
+
+export async function createApi(params) {
+    const res = await request.post('/apis', params);
+    return res;
+}
