@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
-import { Grid } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Feedback, Dialog, Grid, Tag, Select, Table } from '@icedesign/base';
+import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
+import { inject, observer } from 'mobx-react';
+import { computed } from 'mobx';
 import './InterfaceDetail.scss';
 
 const { Row, Col } = Grid;
@@ -26,6 +29,8 @@ const dataSource = {
     ],
 };
 
+@inject('stores')
+@observer
 export default class InterfaceDetail extends Component {
     static displayName = 'InterfaceDetail';
 
@@ -38,79 +43,62 @@ export default class InterfaceDetail extends Component {
         this.state = {};
     }
 
+    @computed
+    get apiStore() {
+        return this.props.stores.apiStore;
+    }
+
+    componentDidMount() {
+        const apiId = this.props.match.params.id;
+        this.fetchApi(apiId);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.location.pathname !== this.props.location.pathname) {
+            const apiId = nextProps.match.params.id;
+            this.fetchApi(apiId);
+        }
+    }
+
+    async fetchApi(id) {
+        try {
+            await this.apiStore.fetchApi(id);
+        } catch (e) {
+            Feedback.toast.error(e.message || '获取接口详情失败');
+        }
+    }
+
     render() {
+        const { currentApi } = this.apiStore;
         return (
             <div>
-                <h2 style={styles.basicDetailTitle}>基础详情页</h2>
+                <h2 style={styles.basicDetailTitle}>接口详情</h2>
 
                 <div style={styles.infoColumn}>
                     <h5 style={styles.infoColumnTitle}>基本信息</h5>
                     <Row wrap style={styles.infoItems}>
                         <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>任务标题：</span>
-                            <span style={styles.infoItemValue}>{dataSource.title}</span>
+                            <span style={styles.infoItemLabel}>接口名称：</span>
+                            <span style={styles.infoItemValue}>{currentApi.name}</span>
                         </Col>
                         <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>店铺名称：</span>
-                            <span style={styles.infoItemValue}>{dataSource.shopName}</span>
-                        </Col>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>任务金额：</span>
-                            <span style={styles.infoItemValue}>¥ {dataSource.amount}</span>
-                        </Col>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>任务赏金：</span>
-                            <span style={styles.infoItemValue}>¥ {dataSource.bounty}</span>
-                        </Col>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>接单时间：</span>
-                            <span style={styles.infoItemValue}>{dataSource.orderTime}</span>
-                        </Col>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>交付时间：</span>
+                            <span style={styles.infoItemLabel}>请求方法：</span>
                             <span style={styles.infoItemValue}>
-                                {dataSource.deliveryTime}
+                                <Tag shape="readonly" size="medium" className={`${currentApi.method}-tag`} style={{ color: '#666' }}>{ currentApi.method }</Tag>
                             </span>
+                        </Col>
+                        <Col xxs="24" l="12" style={styles.infoItem}>
+                            <span style={styles.infoItemLabel}>接口路径：</span>
+                            <span style={styles.infoItemValue}>{currentApi.path}</span>
+                        </Col>
+                        <Col xxs="24" l="12" style={styles.infoItem}>
+                            <span style={styles.infoItemLabel}>更新时间：</span>
+                            <span style={styles.infoItemValue}>{new Date(currentApi.updatedAt).toLocaleString()}</span>
                         </Col>
                     </Row>
                 </div>
                 <div style={styles.infoColumn}>
-                    <h5 style={styles.infoColumnTitle}>更多信息</h5>
-                    <Row wrap style={styles.infoItems}>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>联系方式：</span>
-                            <span style={styles.infoItemValue}>{dataSource.phone}</span>
-                        </Col>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>收货地址：</span>
-                            <span style={styles.infoItemValue}>{dataSource.address}</span>
-                        </Col>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>任务状态：</span>
-                            <span style={styles.infoItemValue}>{dataSource.status}</span>
-                        </Col>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.infoItemLabel}>备注：</span>
-                            <span style={styles.infoItemValue}>{dataSource.remark}</span>
-                        </Col>
-                        <Col xxs="24" l="12" style={styles.infoItem}>
-                            <span style={styles.attachLabel}>附件：</span>
-                            <span>
-                                {dataSource.pics &&
-                                    dataSource.pics.length &&
-                                    dataSource.pics.map((pic, index) => {
-                                        return (
-                                            <img
-                                                key={index}
-                                                src={pic}
-                                                style={styles.attachPics}
-                                                alt="图片"
-                                            />
-                                        );
-                                    })}
-                            </span>
-                        </Col>
-                    </Row>
+                    <h5 style={styles.infoColumnTitle}>请求参数</h5>
                 </div>
             </div>
         );

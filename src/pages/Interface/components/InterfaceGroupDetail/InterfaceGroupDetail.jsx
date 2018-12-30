@@ -16,17 +16,6 @@ const methods = [
     { label: 'CONNECT', value: 'connect' },
 ];
 
-const methodColor = {
-    get: '#cfefdf',
-    post: '#d2eafb',
-    delete: '#fcdbd9',
-    patch: '#fff3cf',
-    put: '#fff3cf',
-    option: '#ffa178',
-    head: '#e5e5e5',
-    connect: '#a7a7a7',
-};
-
 @inject('stores')
 @observer
 export default class InterfaceGroupDetail extends Component {
@@ -183,7 +172,7 @@ export default class InterfaceGroupDetail extends Component {
         const { method, path } = record;
         return (
             <div>
-                <Tag shape="readonly" size="medium" style={{ backgroundColor: methodColor[method], color: '#666' }}>{ method }</Tag>
+                <Tag shape="readonly" size="medium" className={`${method}-tag`} style={{ color: '#666' }}>{ method }</Tag>
                 <span>  { path }</span>
             </div>
         );

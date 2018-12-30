@@ -5,6 +5,7 @@ import {
     createApiGroup,
     deleteApiGroup,
     createApi,
+    fetchApi,
     deleteApi,
     patchApi,
 } from '../api/interface';
@@ -12,6 +13,7 @@ import {
 export default class ApiStore {
     @observable apiGroups = [];
     @observable currentGroup = {};
+    @observable currentApi = {};
 
     @action
     async listApiGroups() {
@@ -78,6 +80,16 @@ export default class ApiStore {
             }
         } else {
             throw new Error('创建接口失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async fetchApi(id) {
+        const res = await fetchApi(id);
+        if (res.status === 200) {
+            this.currentApi = res.data;
+        } else {
+            throw new Error('获取接口详情失败， 请稍后重试');
         }
     }
 
