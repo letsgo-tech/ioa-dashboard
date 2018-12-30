@@ -120,6 +120,7 @@ export default class ApiStore {
                 if (group.id === tgId) tg = group;
             }
 
+            this.removeApiFromGroup(this.currentGroup, apiId);
             tg.apis.push(this.removeApiFromGroup(cg, apiId));
         } else {
             throw new Error('操作失败， 请稍后重试');
