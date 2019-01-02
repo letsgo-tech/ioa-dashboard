@@ -5,6 +5,7 @@ import {
     createApiGroup,
     deleteApiGroup,
     createApi,
+    fetchApi,
     deleteApi,
     patchApi,
 } from '../api/interface';
@@ -12,6 +13,7 @@ import {
 export default class ApiStore {
     @observable apiGroups = [];
     @observable currentGroup = {};
+    @observable currentApi = {};
 
     @action
     async listApiGroups() {
@@ -82,6 +84,16 @@ export default class ApiStore {
     }
 
     @action
+    async fetchApi(id) {
+        const res = await fetchApi(id);
+        if (res.status === 200) {
+            this.currentApi = res.data;
+        } else {
+            throw new Error('获取接口详情失败， 请稍后重试');
+        }
+    }
+
+    @action
     async deleteApi(groupId, apiId) {
         const res = await deleteApi(apiId);
         if (res.status === 200) {
@@ -108,6 +120,7 @@ export default class ApiStore {
                 if (group.id === tgId) tg = group;
             }
 
+            this.removeApiFromGroup(this.currentGroup, apiId);
             tg.apis.push(this.removeApiFromGroup(cg, apiId));
         } else {
             throw new Error('操作失败， 请稍后重试');

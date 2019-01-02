@@ -3,6 +3,7 @@ import { Button, Input, Overlay, Loading, Feedback, Dialog, Tag, Select, Table }
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
+import { Link } from 'react-router-dom';
 import './InterfaceGroupDetail.scss';
 
 const methods = [
@@ -15,17 +16,6 @@ const methods = [
     { label: 'HEAD', value: 'head' },
     { label: 'CONNECT', value: 'connect' },
 ];
-
-const methodColor = {
-    get: '#cfefdf',
-    post: '#d2eafb',
-    delete: '#fcdbd9',
-    patch: '#fff3cf',
-    put: '#fff3cf',
-    option: '#ffa178',
-    head: '#e5e5e5',
-    connect: '#a7a7a7',
-};
 
 @inject('stores')
 @observer
@@ -179,11 +169,22 @@ export default class InterfaceGroupDetail extends Component {
         );
     }
 
+    nameCellRender = (val, index, record) => {
+        const { name, id } = record;
+        return (
+            <Link
+                key={index}
+                to={`/interface/api/${id}`}
+            > {name}
+            </Link>
+        );
+    }
+
     methodCellRender = (val, index, record) => {
         const { method, path } = record;
         return (
             <div>
-                <Tag shape="readonly" size="medium" style={{ backgroundColor: methodColor[method], color: '#666' }}>{ method }</Tag>
+                <Tag shape="readonly" size="medium" className={`${method}-tag`} style={{ color: '#666' }}>{ method }</Tag>
                 <span>  { path }</span>
             </div>
         );
@@ -214,13 +215,13 @@ export default class InterfaceGroupDetail extends Component {
         return (
             <div>
                 <div style={styles.header}>
-                    <h2>{ currentGroup.name } { currentGroup.api ? `共(${currentGroup.api.length})个` : '' }</h2>
+                    <h2>组名：{ currentGroup.name }  { currentGroup.apis ? `接口数：${currentGroup.apis.length} 个` : '' }</h2>
                     <Button type="primary" onClick={() => this.setState({ visible: true })}>添加接口</Button>
                     { this.renderOverlay() }
                 </div>
                 <div>
                     <Table dataSource={currentGroup.apis}>
-                        <Table.Column title="接口名称" dataIndex="name" />
+                        <Table.Column title="接口名称" cell={this.nameCellRender} />
                         <Table.Column title="接口路径" cell={this.methodCellRender} />
                         {
                             this.apiStore.apiGroups.length && <Table.Column title="接口组别" cell={this.groupRender} />

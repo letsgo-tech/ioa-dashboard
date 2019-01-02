@@ -35,6 +35,11 @@ export async function createApi(params) {
     return res;
 }
 
+export async function fetchApi(id) {
+    const res = await request.get(`/apis/${id}`);
+    return res;
+}
+
 export async function deleteApi(id) {
     const res = await request.delete(`/apis/${id}`);
     return res;
