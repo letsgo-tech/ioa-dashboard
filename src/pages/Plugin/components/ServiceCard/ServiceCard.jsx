@@ -49,10 +49,10 @@ export default class ServiceCard extends Component {
     }
 
     render() {
-        const { filtereddPlugin } = this.pluginStore;
+        const { filteredPlugin } = this.pluginStore;
         return (
             <Row wrap gutter="20">
-                {filtereddPlugin.map((item, index) => {
+                {filteredPlugin.map((item, index) => {
                     return (
                         <Col l="8" key={index}>
                             <IceContainer style={styles.container}>
