@@ -1,6 +1,6 @@
 import { observable, action } from 'mobx';
 import {
-    listApiGroups,
+    listApiGroup,
     fetchApiGroup,
     createApiGroup,
     deleteApiGroup,
@@ -16,9 +16,9 @@ export default class ApiStore {
     @observable currentApi = {};
 
     @action
-    async listApiGroups() {
+    async listApiGroup() {
         try {
-            const res = await listApiGroups();
+            const res = await listApiGroup();
             if (res.status === 200) {
                 console.log(res.data);
                 this.apiGroups = res.data.data || [];

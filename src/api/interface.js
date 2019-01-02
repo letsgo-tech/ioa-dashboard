@@ -1,6 +1,6 @@
 import request from '../util/request';
 
-export async function listApiGroups() {
+export async function listApiGroup() {
     const res = await request.get('/apiGroups?order=created_at:asc');
     return res;
 }
