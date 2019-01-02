@@ -94,6 +94,16 @@ export default class ApiStore {
     }
 
     @action
+    async patchApi(id, params) {
+        const res = await patchApi(id, params);
+        if (res.status === 200) {
+            this.currentApi = Object.assign({}, this.currentApi, params);
+        } else {
+            throw new Error('更新接口详情失败， 请稍后重试');
+        }
+    }
+
+    @action
     async deleteApi(groupId, apiId) {
         const res = await deleteApi(apiId);
         if (res.status === 200) {

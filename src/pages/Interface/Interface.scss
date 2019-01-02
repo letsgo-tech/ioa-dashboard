@@ -43,3 +43,15 @@
         background: #a7a7a7
     }
 }
+
+.overlay-form-container {
+    background-color: white;
+    border-radius: 4px;
+    padding: 0 20px;
+
+    .form-item {
+        align-items: center;
+        display: flex;
+        padding: 10px 0;
+    }
+}
