@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Dialog, Tag, Select, Table } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Feedback, Tag, Select, Table } from '@icedesign/base';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';

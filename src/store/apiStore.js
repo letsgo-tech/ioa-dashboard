@@ -8,12 +8,20 @@ import {
     fetchApi,
     deleteApi,
     patchApi,
+    createParam,
+    deleteParam,
+    patchParam,
+    createTarget,
+    deleteTarget,
+    patchTarget
 } from '../api/interface';
 
 export default class ApiStore {
     @observable apiGroups = [];
     @observable currentGroup = {};
     @observable currentApi = {};
+    @observable params = [];
+    @observable targets = [];
 
     @action
     async listApiGroup() {
@@ -22,7 +30,6 @@ export default class ApiStore {
             if (res.status === 200) {
                 console.log(res.data);
                 this.apiGroups = res.data.data || [];
-                //this.apiGroups = res.data || [];
             }
         } catch (e) {
             throw e;
@@ -88,6 +95,8 @@ export default class ApiStore {
         const res = await fetchApi(id);
         if (res.status === 200) {
             this.currentApi = res.data;
+            this.params = this.currentApi.params || [];
+            this.targets = this.currentApi.targets || [];
         } else {
             throw new Error('获取接口详情失败， 请稍后重试');
         }
@@ -144,6 +153,83 @@ export default class ApiStore {
                     return group.apis.splice(i, 1)[0];
                 }
             }
+        }
+    }
+
+    /* apiDetail */
+    @action
+    async createParam(param) {
+        const res = await createParam(param);
+        if (res.status === 200) {
+            this.params.push(res.data);
+        } else {
+            throw new Error('创建参数失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async patchParam(id, param) {
+        const res = await patchParam(id, param);
+        if (res.status === 200) {
+            for (let i = 0; i < this.params.length; i++) {
+                if (this.params[i].id === id) {
+                    this.params[i] = Object.assign({}, this.params[i], param);
+                }
+            }
+        } else {
+            throw new Error('更新参数失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async deleteParam(id) {
+        const res = await deleteParam(id);
+        if (res.status === 200) {
+            for (let i = 0; i < this.params.length; i++) {
+                if (this.params[i].id === id) {
+                    this.params.splice(i, 1);
+                }
+            }
+        } else {
+            throw new Error('删除参数失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async createTarget(param) {
+        const res = await createTarget(param);
+        if (res.status === 200) {
+            this.targets.push(res.data);
+        } else {
+            throw new Error('创建转发目标失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async patchTarget(id, param) {
+        const res = await patchTarget(id, param);
+        if (res.status === 200) {
+            for (let i = 0; i < this.targets.length; i++) {
+                if (this.targets[i].id === id) {
+                    this.targets[i] = Object.assign({}, this.targets[i], param);
+                }
+            }
+        } else {
+            throw new Error('更新转发目标失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async deleteTarget(id) {
+        const res = await deleteTarget(id);
+        if (res.status === 200) {
+            for (let i = 0; i < this.targets.length; i++) {
+                if (this.targets[i].id === id) {
+                    this.targets.splice(i, 1);
+                }
+            }
+        } else {
+            throw new Error('删除转发目标失败， 请稍后重试');
         }
     }
 }

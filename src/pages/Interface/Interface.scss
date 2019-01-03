@@ -49,6 +49,13 @@
     border-radius: 4px;
     padding: 0 20px;
 
+    .form-item-label {
+        width: 100px;
+        margin-right: 10px;
+        display: inline-block;
+        text-align: right;
+    }
+
     .form-item {
         align-items: center;
         display: flex;

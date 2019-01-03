@@ -49,3 +49,33 @@ export async function patchApi(id, params) {
     const res = await request.patch(`/apis/${id}`, params);
     return res;
 }
+
+export async function createParam(param) {
+    const res = await request.post('params', param);
+    return res;
+}
+
+export async function patchParam(id, param) {
+    const res = await request.patch(`params/${id}`, param);
+    return res;
+}
+
+export async function deleteParam(id) {
+    const res = await request.delete(`params/${id}`);
+    return res;
+}
+
+export async function createTarget(target) {
+    const res = await request.post('targets', target);
+    return res;
+}
+
+export async function patchTarget(id, target) {
+    const res = await request.patch(`targets/${id}`, target);
+    return res;
+}
+
+export async function deleteTarget(id) {
+    const res = await request.delete(`targets/${id}`);
+    return res;
+}

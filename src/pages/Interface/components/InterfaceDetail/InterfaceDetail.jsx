@@ -5,6 +5,7 @@ import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
 
 import ParamList from './component/ParamList';
+import TargetList from './component/TargetList';
 import './InterfaceDetail.scss';
 
 const { Row, Col } = Grid;
@@ -141,12 +142,8 @@ export default class InterfaceDetail extends Component {
                         </Col>
                     </Row>
                 </div>
-                <ParamList apiStore={this.apiStore} />
-
-                <div style={styles.secTitle}>
-                    <h5 style={styles.infoColumnTitle}>转发目标</h5>
-                    <Button size="small" type="primary">新增</Button>
-                </div>
+                <ParamList />
+                <TargetList />
 
                 <div style={styles.secTitle}>
                     <h5 style={styles.infoColumnTitle}>插件</h5>

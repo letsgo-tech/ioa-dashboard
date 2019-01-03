@@ -1,24 +1,31 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Dialog, Grid, Tag, Select, Table } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Feedback, Dialog, Select, Table } from '@icedesign/base';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
-const location = [
+import { inject, observer } from 'mobx-react';
+
+const locations = [
     { label: 'query', value: 'query' },
     { label: 'path', value: 'path' },
     { label: 'form', value: 'form' },
 ];
 
+@inject('stores')
+@observer
 export default class ParamList extends Component {
     constructor(props) {
         super(props);
         this.state = {
             visible: false,
+            loading: false,
             isCreating: false,
+            isPatching: false,
             value: {
                 name: '',
                 targetName: '',
                 location: 'path',
             },
+            currentParamId: '',
         };
     }
 
@@ -26,24 +33,37 @@ export default class ParamList extends Component {
 
     validateFields = () => {
         const { validateFields } = this.refs.form;
-        const { apiStore } = this.props;
+        const { apiStore } = this.props.stores;
         const { currentApi } = apiStore;
-        const params = currentApi.params || [];
-        const id = currentApi.id;
+        const { currentParamId } = this.state;
 
         validateFields(async (errors, values) => {
             if (!errors) {
                 try {
-                    this.setState({ isCreating: true });
-                    params.push({ apiId: id, ...values });
-                    await apiStore.patchApi(id, { params });
-                    this.setState({ isCreating: false, visible: false });
-                    this.setState({ value: { name: '', targetName: '', location: 'path' } });
+                    this.setState({ loading: true });
+                    if (this.state.isCreating) {
+                        await apiStore.createParam({ apiId: currentApi.id, ...values });
+                    }
+
+                    if (this.state.isPatching) {
+                        await apiStore.patchParam(currentParamId, values);
+                    }
+                    this.setState({ loading: false, visible: false });
+                    this.onCloseOverlay();
                 } catch (e) {
-                    this.setState({ isCreating: false });
+                    this.setState({ loading: false });
                     Feedback.toast.error(e.message || '添加参数失败， 请稍后重试');
                 }
             }
+        });
+    }
+
+    onCloseOverlay() {
+        this.setState({
+            visible: false,
+            isCreating: false,
+            isPatching: false,
+            value: { name: '', targetName: '', location: 'path' },
         });
     }
 
@@ -56,9 +76,9 @@ export default class ParamList extends Component {
                 align="cc cc"
                 canCloseByOutSideClick={false}
                 safeNode={() => this.refs.from}
-                onRequestClose={() => this.setState({ visible: false })}
+                onRequestClose={() => this.onCloseOverlay()}
             >
-                <Loading shape="flower" tip="creating..." color="#666" visible={this.state.isCreating}>
+                <Loading shape="flower" tip="creating..." color="#666" visible={this.state.loading}>
                     <div className="overlay-form-container">
                         <h4 style={{ paddingTop: '10px' }}>添加参数</h4>
                         <FormBinderWrapper
@@ -102,7 +122,7 @@ export default class ParamList extends Component {
                                         <FormBinder name="location" required message="参数位置">
                                             <Select
                                                 style={{ height: '32px', lineHeight: '32px' }}
-                                                dataSource={location}
+                                                dataSource={locations}
                                                 placeholder="参数位置"
                                             />
                                         </FormBinder>
@@ -111,7 +131,7 @@ export default class ParamList extends Component {
                             </div>
 
                             <div style={{ textAlign: 'end', padding: '10px 0' }}>
-                                <Button type="normal" onClick={() => this.setState({ visible: false })} style={{ marginRight: '10px' }}>
+                                <Button type="normal" onClick={() => this.onCloseOverlay()} style={{ marginRight: '10px' }}>
                                     取 消
                                 </Button>
                                 <Button type="primary" onClick={() => this.validateFields()} disabled={!(this.state.value.name)}>
@@ -125,24 +145,69 @@ export default class ParamList extends Component {
         );
     }
 
+    renderOperateCell = (val, index, record) => {
+        const { apiStore } = this.props.stores;
+        const { id, name, targetName, location } = record;
+
+        return (
+            <span>
+                <a onClick={() => {
+                    this.setState({ visible: true, isCreating: false, isPatching: true, value: { name, targetName, location }, currentParamId: id });
+                }}
+                >
+                    编辑
+                </a>
+                <span> | </span>
+                <a onClick={() => {
+                    Dialog.confirm({
+                        content: `删除${record.name}`,
+                        title: '删除参数',
+                        onOk: async () => {
+                            try {
+                                await apiStore.deleteParam(record.id);
+                            } catch (e) {
+                                Feedback.toast.error(e.message || '删除失败， 请稍后重试');
+                            }
+                        },
+                    });
+                }}
+                >
+                    删除
+                </a>
+            </span>
+        );
+    }
+
     render() {
-        const { params } = this.props.apiStore.currentApi;
+        const { params } = this.props.stores.apiStore;
+
         return (
             <div>
                 <div style={styles.secTitle}>
                     <h5 style={styles.infoColumnTitle}>请求参数</h5>
-                    <Button size="small" type="primary" onClick={() => this.setState({ visible: true })}>新增</Button>
-                    { this.renderOverlay() }
+                    <Button
+                        size="small"
+                        type="primary"
+                        onClick={() => {
+                            this.setState({ visible: true, isCreating: true, isPatching: false });
+                        }}
+                    >
+                        新增
+                    </Button>
                 </div>
                 <div>
                     {
-                        params && params.map((item, idx) => {
-                            return (
-                                <div key={idx}>test</div>
-                            );
-                        })
+                        params.length ?
+                            <Table dataSource={params.slice()}>
+                                <Table.Column title="参数名称" dataIndex="name" />
+                                <Table.Column title="目标名称" dataIndex="targetName" />
+                                <Table.Column title="参数位置" dataIndex="location" />
+                                <Table.Column title="操作" cell={this.renderOperateCell} />
+                            </Table> :
+                            '无'
                     }
                 </div>
+                { this.renderOverlay() }
             </div>
         );
     }
@@ -150,6 +215,7 @@ export default class ParamList extends Component {
 
 const styles = {
     secTitle: {
+        alignItems: 'center',
         display: 'flex',
         justifyContent: 'space-between',
     },
