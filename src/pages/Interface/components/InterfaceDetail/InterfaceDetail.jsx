@@ -3,31 +3,22 @@ import { Button, Input, Overlay, Loading, Feedback, Dialog, Grid, Tag, Select, T
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
+
+import ParamList from './component/ParamList';
+import TargetList from './component/TargetList';
 import './InterfaceDetail.scss';
 
 const { Row, Col } = Grid;
-
-/**
- * 渲染详情信息的数据
- */
-const dataSource = {
-    title: '集盒家居旗舰店双十一活动',
-    shopName: '集盒家居旗舰店',
-    amount: '1000.00',
-    bounty: '200.00',
-    orderTime: '2017-10-18 12:20:07',
-    deliveryTime: '2017-10-18 12:20:07',
-    phone: '15612111213',
-    address: '杭州市文一西路',
-    status: '进行中',
-    remark: '暂无',
-    pics: [
-        require('./images/clothes.png'),
-        require('./images/dress.png'),
-        require('./images/dryer.png'),
-        require('./images/quilt.png'),
-    ],
-};
+const methods = [
+    { label: 'GET', value: 'get' },
+    { label: 'POST', value: 'post' },
+    { label: 'PUT', value: 'put' },
+    { label: 'DELETE', value: 'delete' },
+    { label: 'PATCH', value: 'patch' },
+    { label: 'OPTION', value: 'option' },
+    { label: 'HEAD', value: 'head' },
+    { label: 'CONNECT', value: 'connect' },
+];
 
 @inject('stores')
 @observer
@@ -40,7 +31,13 @@ export default class InterfaceDetail extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            isEdit: false,
+            isLoading: false,
+            name: '',
+            method: '',
+            path: '',
+        };
     }
 
     @computed
@@ -48,7 +45,7 @@ export default class InterfaceDetail extends Component {
         return this.props.stores.apiStore;
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const apiId = this.props.match.params.id;
         this.fetchApi(apiId);
     }
@@ -68,28 +65,76 @@ export default class InterfaceDetail extends Component {
         }
     }
 
+    async updateApi() {
+        const { currentApi } = this.apiStore;
+        const { name, method, path } = this.state;
+        if (!name) {
+            alert('名称不能为空');
+            return;
+        }
+        try {
+            this.setState({ isLoading: true });
+            await this.apiStore.patchApi(currentApi.id, { name, method, path });
+            this.setState({ isLoading: false, isEdit: false });
+        } catch (e) {
+            this.setState({ isLoading: false });
+            Feedback.toast.error(e.message || '更新接口失败， 请稍后重试');
+        }
+    }
+
+    onEdit() {
+        const { name, method, path } = this.apiStore.currentApi;
+        this.setState({ isEdit: true, name, method, path });
+    }
+
     render() {
         const { currentApi } = this.apiStore;
         return (
             <div>
-                <h2 style={styles.basicDetailTitle}>接口详情</h2>
+                <h2 style={styles.basicDetailTitle}>接口详情 ({currentApi.name})</h2>
 
                 <div style={styles.infoColumn}>
-                    <h5 style={styles.infoColumnTitle}>基本信息</h5>
+                    <div style={styles.secTitle}>
+                        <h5 style={styles.infoColumnTitle}>基本信息</h5>
+                        {
+                            this.state.isEdit ?
+                                <div>
+                                    <Button size="small" onClick={() => this.setState({ isEdit: false })}>取消</Button>
+                                    <Button size="small" type="primary" loading={this.state.isLoading} onClick={() => this.updateApi()}>提交</Button>
+                                </div> :
+                                <Button size="small" type="primary" onClick={() => this.onEdit()}>编辑</Button>
+                        }
+                    </div>
                     <Row wrap style={styles.infoItems}>
                         <Col xxs="24" l="12" style={styles.infoItem}>
                             <span style={styles.infoItemLabel}>接口名称：</span>
-                            <span style={styles.infoItemValue}>{currentApi.name}</span>
+                            {
+                                this.state.isEdit ?
+                                    <Input value={this.state.name} onChange={name => this.setState({ name })} placeholder="name" /> :
+                                    <span style={styles.infoItemValue}>{currentApi.name}</span>
+                            }
                         </Col>
                         <Col xxs="24" l="12" style={styles.infoItem}>
                             <span style={styles.infoItemLabel}>请求方法：</span>
                             <span style={styles.infoItemValue}>
-                                <Tag shape="readonly" size="medium" className={`${currentApi.method}-tag`} style={{ color: '#666' }}>{ currentApi.method }</Tag>
+                                {
+                                    this.state.isEdit ?
+                                        <Select
+                                            dataSource={methods}
+                                            value={this.state.method}
+                                            onChange={method => this.setState({ method })}
+                                        /> :
+                                        <Tag shape="readonly" size="medium" className={`${currentApi.method}-tag`} style={{ color: '#666' }}>{ currentApi.method }</Tag>
+                                }
                             </span>
                         </Col>
                         <Col xxs="24" l="12" style={styles.infoItem}>
                             <span style={styles.infoItemLabel}>接口路径：</span>
-                            <span style={styles.infoItemValue}>{currentApi.path}</span>
+                            {
+                                this.state.isEdit ?
+                                    <Input value={this.state.path} onChange={path => this.setState({ path })} placeholder="/{path}" /> :
+                                    <span style={styles.infoItemValue}>{currentApi.path}</span>
+                            }
                         </Col>
                         <Col xxs="24" l="12" style={styles.infoItem}>
                             <span style={styles.infoItemLabel}>更新时间：</span>
@@ -97,8 +142,12 @@ export default class InterfaceDetail extends Component {
                         </Col>
                     </Row>
                 </div>
-                <div style={styles.infoColumn}>
-                    <h5 style={styles.infoColumnTitle}>请求参数</h5>
+                <ParamList />
+                <TargetList />
+
+                <div style={styles.secTitle}>
+                    <h5 style={styles.infoColumnTitle}>插件</h5>
+                    <Button size="small" type="primary">新增</Button>
                 </div>
             </div>
         );
@@ -106,6 +155,10 @@ export default class InterfaceDetail extends Component {
 }
 
 const styles = {
+    secTitle: {
+        display: 'flex',
+        justifyContent: 'space-between',
+    },
     basicDetailTitle: {
         margin: '10px 0',
         fontSize: '16px',
@@ -123,6 +176,8 @@ const styles = {
         marginLeft: '25px',
     },
     infoItem: {
+        alignItems: 'center',
+        display: 'flex',
         marginBottom: '18px',
         listStyle: 'none',
         fontSize: '14px',

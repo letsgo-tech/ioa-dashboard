@@ -54,7 +54,7 @@ export default class PluginStore {
     }
 
     @computed
-    get filtereddPlugin() {
+    get filteredPlugin() {
         if (this.searchStr === '' && this.statusFlag === 'all') {
             return this.plugins;
         }

@@ -44,6 +44,6 @@ const styles = {
     container: {
         minHeight: '100vh',
         backgroundColor: '#f2f2f2',
-        minWidth: '1280px',
+        minWidth: '980px',
     },
 };

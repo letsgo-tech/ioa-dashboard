@@ -34,15 +34,20 @@ export default class InterfaceGroupList extends Component {
 
     componentWillMount() { }
 
-    componentDidMount() {
+    async componentDidMount() {
         const { apiStore } = this.props.stores;
-        apiStore.listApiGroup();
+        await apiStore.listApiGroup();
     }
 
     componentWillUnmount() { }
 
     onSearchChange(value) {
         this.setState({ searchStr: value });
+    }
+
+    @computed
+    get apiStore() {
+        return this.props.stores.apiStore;
     }
 
     @computed
@@ -87,13 +92,25 @@ export default class InterfaceGroupList extends Component {
     }
 
     renderItem = (item, idx) => {
-        const openState = this.state[`${item.id}`] || !!this.state.searchStr;
+        const { apiGroupId, id: currentApiId } = this.apiStore.currentApi;
+        const { id: currentGroupId } = this.apiStore.currentGroup;
+        let openState;
+
+        if (this.state[`${item.id}`] === undefined) {
+            openState = !!this.state.searchStr
+                        || apiGroupId === item.id
+                        || currentGroupId === item.id;
+        } else {
+            openState = !!this.state.searchStr
+                        || this.state[`${item.id}`];
+        }
+
         return (
             <div key={idx}>
                 <Link
                     to={`/interface/group/${item.id}`}
                     style={styles.treeCardItem}
-                    className="tree-card-item"
+                    className={`tree-card-item ${(apiGroupId === item.id || currentGroupId === item.id) && 'selected'}`}
                     onClick={() => this.setState({ [`${item.id}`]: !openState })}
                 >
                     <span style={styles.tab}>{item.name}</span>
@@ -116,7 +133,7 @@ export default class InterfaceGroupList extends Component {
                             {item.apis.map((api, index) => {
                                 return (
                                     <Link
-                                        className="api-item"
+                                        className={`api-item ${currentApiId === api.id && 'selected'}`}
                                         key={index}
                                         to={`/interface/api/${api.id}`}
                                     >

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Dialog, Tag, Select, Table } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Feedback, Tag, Select, Table } from '@icedesign/base';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -68,7 +68,7 @@ export default class InterfaceGroupDetail extends Component {
         try {
             await this.apiStore.fetchApiGroup(id);
         } catch (e) {
-            Feedback.toast.error(e || '获取分组失败');
+            Feedback.toast.error(e.message || '获取分组失败');
         }
     }
 
@@ -84,9 +84,9 @@ export default class InterfaceGroupDetail extends Component {
                     this.setState({ isCreating: false, visible: false });
                     Feedback.toast.success('添加接口成功');
                     this.setState({ value: { apiGroupId: '', name: '', method: 'get', path: '' } });
-                } catch (error) {
+                } catch (e) {
                     this.setState({ isCreating: false });
-                    Feedback.toast.error('添加接口失败， 请稍后重试');
+                    Feedback.toast.error(e.message || '添加接口失败， 请稍后重试');
                 }
             }
         });
@@ -105,21 +105,21 @@ export default class InterfaceGroupDetail extends Component {
                 onRequestClose={() => this.setState({ visible: false })}
             >
                 <Loading shape="flower" tip="creating..." color="#666" visible={this.state.isCreating}>
-                    <div style={styles.formContainer}>
+                    <div className="overlay-form-container">
                         <h4 style={{ paddingTop: '10px' }}>添加接口</h4>
                         <FormBinderWrapper
                             value={this.state.value}
                             onChange={value => this.setState({ value })}
                             ref="form"
                         >
-                            <div style={styles.formItems}>
-                                <div style={styles.formItem}>
+                            <div>
+                                <div className="form-item">
                                     <span style={styles.formItemLabel}>组别：</span>
                                     <Input value={currentGroup.name} disabled style={{ flex: 1 }} />
                                 </div>
 
                                 <div>
-                                    <div style={styles.formItem}>
+                                    <div className="form-item">
                                         <span style={styles.formItemLabel}>名称：</span>
                                         <FormBinder name="name" required message="请输入接口名称">
                                             <Input
@@ -131,8 +131,8 @@ export default class InterfaceGroupDetail extends Component {
                                     <FormError name="name" />
                                 </div>
 
-                                <div style={styles.formItemWrapper}>
-                                    <div style={styles.formItem}>
+                                <div>
+                                    <div className="form-item">
                                         <span style={styles.formItemLabel}>路径：</span>
                                         <div style={{ display: 'flex' }}>
                                             <FormBinder name="method" required message="请求方法">
@@ -198,9 +198,9 @@ export default class InterfaceGroupDetail extends Component {
                 <Select
                     dataSource={this.groups}
                     defaultValue={currentGroupId}
-                    onChange={async val => {
+                    onChange={async value => {
                         try {
-                            this.apiStore.changeGroup(apiId, currentGroupId, val);
+                            this.apiStore.changeGroup(apiId, currentGroupId, value);
                         } catch (e) {
                             Feedback.toast.error(e || '操作失败');
                         }
@@ -237,15 +237,5 @@ const styles = {
     header: {
         display: 'flex',
         justifyContent: 'space-between',
-    },
-    formContainer: {
-        backgroundColor: 'white',
-        borderRadius: '4px',
-        padding: '0 20px',
-    },
-    formItem: {
-        alignItems: 'center',
-        display: 'flex',
-        padding: '10px 0',
     },
 };
