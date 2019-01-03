@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Input, Overlay, Loading, Feedback, Dialog, Select, Table } from '@icedesign/base';
+import BalloonConfirm from '@icedesign/balloon-confirm';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
 import { inject, observer } from 'mobx-react';
@@ -89,7 +90,7 @@ export default class ParamList extends Component {
                             <div>
                                 <div>
                                     <div className="form-item">
-                                        <span style={styles.formItemLabel}>参数名称：</span>
+                                        <span className="form-item-label required">参数名称：</span>
                                         <FormBinder name="name" required message="请输参数名称">
                                             <Input
                                                 size="large"
@@ -104,7 +105,7 @@ export default class ParamList extends Component {
                                     this.state.value.name &&
                                     <div>
                                         <div className="form-item">
-                                            <span style={styles.formItemLabel}>目标名称：</span>
+                                            <span className="form-item-label required">目标名称：</span>
                                             <FormBinder name="targetName" required message="请输目标参数名称">
                                                 <Input
                                                     size="large"
@@ -117,7 +118,7 @@ export default class ParamList extends Component {
                                 }
 
                                 <div className="form-item">
-                                    <span style={styles.formItemLabel}>参数位置：</span>
+                                    <span className="form-item-label required">参数位置：</span>
                                     <div style={{ display: 'flex' }}>
                                         <FormBinder name="location" required message="参数位置">
                                             <Select
@@ -158,22 +159,17 @@ export default class ParamList extends Component {
                     编辑
                 </a>
                 <span> | </span>
-                <a onClick={() => {
-                    Dialog.confirm({
-                        content: `删除${record.name}`,
-                        title: '删除参数',
-                        onOk: async () => {
-                            try {
-                                await apiStore.deleteParam(record.id);
-                            } catch (e) {
-                                Feedback.toast.error(e.message || '删除失败， 请稍后重试');
-                            }
-                        },
-                    });
-                }}
-                >
-                    删除
-                </a>
+                <BalloonConfirm
+                    onConfirm={async () => {
+                        try {
+                            await apiStore.deleteParam(record.id);
+                        } catch (e) {
+                            Feedback.toast.error(e.message || '删除失败， 请稍后重试');
+                        }
+                    }}
+                    title={`删除${record.name}`}
+                ><span>删除</span>
+                </BalloonConfirm>
             </span>
         );
     }

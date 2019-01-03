@@ -137,7 +137,7 @@ export default class InterfaceGroupDetail extends Component {
                                         <div style={{ display: 'flex' }}>
                                             <FormBinder name="method" required message="请求方法">
                                                 <Select
-                                                    style={{ height: '32px', lineHeight: '32px' }}
+                                                    style={{ height: '32px', lineHeight: '32px', width: '120px' }}
                                                     dataSource={methods}
                                                     placeholder="方法"
                                                 />
@@ -196,6 +196,7 @@ export default class InterfaceGroupDetail extends Component {
         return (
             <div>
                 <Select
+                    style={{ width: '150px' }}
                     dataSource={this.groups}
                     defaultValue={currentGroupId}
                     onChange={async value => {

@@ -52,8 +52,21 @@
     .form-item-label {
         width: 100px;
         margin-right: 10px;
-        display: inline-block;
-        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+
+        &.required {
+
+            &::before {
+                display: inline-block;
+                margin-right: 4px;
+                content: "*";
+                font-family: SimSun;
+                line-height: 1;
+                font-size: 14px;
+                color: #f5222d;
+            }
+        }
     }
 
     .form-item {

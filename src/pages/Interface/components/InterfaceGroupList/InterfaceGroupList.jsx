@@ -115,10 +115,11 @@ export default class InterfaceGroupList extends Component {
                 >
                     <span style={styles.tab}>{item.name}</span>
                     <span className="operate-btns">
-                        <span onClick={() => {
+                        <span onClick={(e) => {
+                            e.stopPropagation();
                             Dialog.confirm({
                                 title: `是否删除该分组：${item.name}`,
-                                content: '删除后将无法恢复',
+                                content: '同时删除分组下接口，删除后将无法恢复',
                                 onOk: () => this.deleteApiGroup(item.id),
                             });
                         }}

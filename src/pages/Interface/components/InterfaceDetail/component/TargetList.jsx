@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Input, Overlay, Loading, Feedback, Dialog, Select, Table } from '@icedesign/base';
+import BalloonConfirm from '@icedesign/balloon-confirm';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
 import { inject, observer } from 'mobx-react';
@@ -100,10 +101,10 @@ export default class TargetList extends Component {
                         >
                             <div>
                                 <div className="form-item">
-                                    <span className="form-item-label">serverMethod：</span>
+                                    <span className="form-item-label required">serverMethod：</span>
                                     <FormBinder name="method" required message="请选择请求协议">
                                         <Select
-                                            style={{ height: '32px', lineHeight: '32px' }}
+                                            style={{ height: '32px', lineHeight: '32px', width: '120px' }}
                                             dataSource={methods}
                                         />
                                     </FormBinder>
@@ -111,10 +112,10 @@ export default class TargetList extends Component {
 
                                 <div>
                                     <div className="form-item">
-                                        <span className="form-item-label">serverScheme：</span>
+                                        <span className="form-item-label required">serverScheme：</span>
                                         <FormBinder name="scheme" required message="请选择请求协议">
                                             <Select
-                                                style={{ height: '32px', lineHeight: '32px' }}
+                                                style={{ height: '32px', lineHeight: '32px', width: '120px' }}
                                                 dataSource={schemes}
                                             />
                                         </FormBinder>
@@ -124,7 +125,7 @@ export default class TargetList extends Component {
 
                                 <div>
                                     <div className="form-item">
-                                        <span className="form-item-label">serverHost：</span>
+                                        <span className="form-item-label required">serverHost：</span>
                                         <FormBinder name="host" required message="请填写host地址">
                                             <Input
                                                 size="large"
@@ -147,7 +148,7 @@ export default class TargetList extends Component {
 
                                 <div>
                                     <div className="form-item">
-                                        <span className="form-item-label">serverPath：</span>
+                                        <span className="form-item-label required">serverPath：</span>
                                         <FormBinder name="path" required message="请填写路径">
                                             <Input
                                                 size="large"
@@ -187,22 +188,17 @@ export default class TargetList extends Component {
                     编辑
                 </a>
                 <span> | </span>
-                <a onClick={() => {
-                    Dialog.confirm({
-                        content: `删除 ${scheme}://${host}${port && ':'}${port}${path}`,
-                        title: '删除参数',
-                        onOk: async () => {
-                            try {
-                                await apiStore.deleteTarget(record.id);
-                            } catch (e) {
-                                Feedback.toast.error(e.message || '删除失败， 请稍后重试');
-                            }
-                        },
-                    });
-                }}
-                >
-                    删除
-                </a>
+                <BalloonConfirm
+                    onConfirm={async () => {
+                        try {
+                            await apiStore.deleteTarget(record.id);
+                        } catch (e) {
+                            Feedback.toast.error(e.message || '删除失败， 请稍后重试');
+                        }
+                    }}
+                    title={`删除 ${scheme}://${host}${port && ':'}${port}${path}`}
+                ><span>删除</span>
+                </BalloonConfirm>
             </span>
         );
     }
