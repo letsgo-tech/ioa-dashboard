@@ -11,14 +11,13 @@ const { Option } = Select;
 
 @inject('stores')
 @observer
-export default class ConfigPluginOverlay extends Component {
+export default class AddPluginOverlay extends Component {
     constructor(props) {
         super(props);
         this.state = {
             loading: false,
             value: {},
             selectedId: '',
-            inputing: false,
         };
     }
 
@@ -41,25 +40,14 @@ export default class ConfigPluginOverlay extends Component {
         this.pluginStore.listPlugin();
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextState.inputing) {
-            return false;
-        }
-
-        return true;
-    }
-
     async onSelected(id) {
-        this.setState({ selectedId: id, inputing: false });
+        this.setState({ selectedId: id, value: {} });
 
         if (id === this.pluginStore.currentPlugin.id) return;
         this.setState({ loading: true });
         try {
             await this.pluginStore.fetchPlugin(id);
             await this.pluginStore.fetchConfigTpl(this.pluginStore.currentPlugin.name);
-            const value = {};
-            this.currentConfigTpls.slice().forEach(item => value[item.name] = '');
-            this.setState({ value });
         } catch (e) {
             console.error(e.message);
             Feedback.toast.error('获取插件失败，请稍后重试');
@@ -70,7 +58,7 @@ export default class ConfigPluginOverlay extends Component {
 
     onClose() {
         this.props.onCloseOverlay();
-        this.setState({ inputing: false, selectedId: '', value: {} });
+        this.setState({ selectedId: '', value: {} });
     }
 
     validateFields() {
@@ -79,7 +67,6 @@ export default class ConfigPluginOverlay extends Component {
 
         validateFields(async (errors, values) => {
             if (!errors) {
-                this.setState({ inputing: false });
                 const plugin = {
                     id: currentPlugin.id,
                     name: currentPlugin.name,
@@ -125,7 +112,6 @@ export default class ConfigPluginOverlay extends Component {
                         <Loading shape="flower" tip="loading..." color="#666" visible={this.state.loading}>
                             <FormBinderWrapper
                                 value={this.state.value}
-                                onChange={value => this.setState({ inputing: true, value })}
                                 ref="form"
                                 key={Math.random()}
                             >
