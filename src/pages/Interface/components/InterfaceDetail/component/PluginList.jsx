@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Icon, Select, Grid } from '@icedesign/base';
+import { Button, Feedback, Icon, Grid } from '@icedesign/base';
 import BalloonConfirm from '@icedesign/balloon-confirm';
-import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
 
-const { Option } = Select;
+import ConfigPluginOverlay from '../../ConfigPluginOverlay/ConfigPluginOverlay';
+
 const { Row, Col } = Grid;
 
 @inject('stores')
@@ -15,11 +15,9 @@ export default class PluginList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            visible: false,
-            loading: false,
+            isEditing: false,
+            updating: false,
             isAdding: false,
-            selectedIndex: '',
-            selectedPlugin: {},
         };
     }
 
@@ -46,9 +44,9 @@ export default class PluginList extends Component {
         this.pluginStore.listPlugin();
     }
 
-    addPlugin() {
+    addPlugin(plugin) {
         const plugins = this.apiPlugins.slice();
-        plugins.push(this.state.selectedPlugin);
+        plugins.push(plugin);
         this.updateApiPlugin(plugins);
     }
 
@@ -79,91 +77,36 @@ export default class PluginList extends Component {
     async updateApiPlugin(plugins) {
         const { id } = this.apiStore.currentApi;
         try {
-            this.setState({ loading: true });
+            this.setState({ updating: true });
             await this.apiStore.patchApi(id, { plugins: JSON.stringify(plugins) });
-            this.setState({ loading: false, selectedIndex: '', selectedPlugin: {} });
+            this.setState({ updating: false, isAdding: false });
         } catch (e) {
-            this.setState({ loading: true });
+            this.setState({ updating: false });
             Feedback.toast.error(e.message || '添加插件失败，请稍后重试');
         }
     }
 
     onCloseOverlay() {
         this.setState({
-            visible: false,
+            isEditing: false,
+            isAdding: false,
         });
     }
 
-    renderOverlay = () => {
-        return (
-            <Overlay
-                visible={this.state.visible}
-                hasMask
-                disableScroll
-                align="cc cc"
-                canCloseByOutSideClick={false}
-                safeNode={() => this.refs.from}
-                onRequestClose={() => this.onCloseOverlay()}
-            >
-                <Loading shape="flower" tip="creating..." color="#666" visible={this.state.loading}>
-                    <div>test</div>
-                </Loading>
-            </Overlay>
-        );
-    }
-
     render() {
-        const sourcePlugin = this.pluginStore.plugins;
-
         return (
             <div>
                 <div style={styles.secTitle}>
                     <h5 style={styles.infoColumnTitle}>插件</h5>
-                    {
-                        this.state.isAdding ?
-                            <div style={styles.secTitle}>
-                                <Select
-                                    style={{ width: '140px' }}
-                                    onChange={val => {
-                                        this.setState({ selectedIndex: val, selectedPlugin: sourcePlugin[val] });
-                                    }}
-                                    value={this.state.selectedIndex}
-                                >
-                                    {
-                                        sourcePlugin.map((item, index) => {
-                                            return <Option key={index} value={String(index)}>{item.name}</Option>;
-                                        })
-                                    }
-                                </Select>
-                                <Button
-                                    style={{ marginLeft: '10px' }}
-                                    size="small"
-                                    type="primary"
-                                    disabled={!(this.state.selectedPlugin.id)}
-                                    loading={this.state.loading}
-                                    onClick={() => this.addPlugin()}
-                                >
-                                    确定
-                                </Button>
-                                <Button
-                                    style={{ marginLeft: '5px' }}
-                                    size="small"
-                                    disabled={this.setState.loading}
-                                    onClick={() => this.setState({ isAdding: false, selectedIndex: '', selectedPlugin: {} })}
-                                >
-                                    取消
-                                </Button>
-                            </div> :
-                            <Button
-                                size="small"
-                                type="primary"
-                                onClick={() => {
-                                    this.setState({ isAdding: true });
-                                }}
-                            >
-                                新增
-                            </Button>
-                    }
+                    <Button
+                        size="small"
+                        type="primary"
+                        onClick={() => {
+                            this.setState({ isAdding: true });
+                        }}
+                    >
+                        新增
+                    </Button>
                 </div>
                 <div>
                     {
@@ -209,7 +152,7 @@ export default class PluginList extends Component {
                                                     <Col span="4" style={styles.pluginCol}>
                                                         <span>
                                                             <a onClick={() => {
-                                                                this.setState({ visible: true });
+                                                                this.setState({ isEditing: true });
                                                             }}
                                                             >
                                                                 编辑
@@ -228,7 +171,18 @@ export default class PluginList extends Component {
                                         );
                                     })
                                 }
-                                { this.renderOverlay() }
+                                <ConfigPluginOverlay
+                                    visible={this.state.isAdding}
+                                    updating={this.state.updating}
+                                    onCloseOverlay={() => this.onCloseOverlay()}
+                                    submit={plugin => this.addPlugin(plugin)}
+                                />
+                                <ConfigPluginOverlay
+                                    visible={this.state.isEditing}
+                                    updating={this.state.updating}
+                                    onCloseOverlay={() => this.onCloseOverlay()}
+                                    submit={plugin => this.addPlugin(plugin)}
+                                />
                             </div> :
                             <div style={styles.pluginCol}>无</div>
                     }

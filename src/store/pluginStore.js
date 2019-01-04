@@ -5,13 +5,16 @@ import {
     createPlugin,
     deletePlugin,
     patchPlugin,
-    putPlugin
+    putPlugin,
+    fetchConfigTpl,
 } from '../api/plugin';
 
 export default class PluginStore {
     @observable plugins = [];
+    @observable currentPlugin = {};
     @observable searchStr = '';
     @observable statusFlag = 'all';
+    @observable currentConfigTpls = [];
 
     @action
     async listPlugin() {
@@ -22,6 +25,26 @@ export default class PluginStore {
             }
         } catch (e) {
             throw e;
+        }
+    }
+
+    @action
+    async fetchPlugin(id) {
+        const res = await fetchPlugin(id);
+        if (res.status === 200) {
+            this.currentPlugin = res.data;
+        } else {
+            throw new Error('获取插件详情失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async fetchConfigTpl(id) {
+        const res = await fetchConfigTpl(id);
+        if (res.status === 200) {
+            this.currentConfigTpls = res.data || [];
+        } else {
+            throw new Error('获取插件配置项失败， 请稍后重试');
         }
     }
 
