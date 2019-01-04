@@ -53,7 +53,6 @@ export default class ConfigPluginOverlay extends Component {
         this.setState({ selectedId: id, inputing: false });
 
         if (id === this.pluginStore.currentPlugin.id) return;
-        this.forceUpdate();
         this.setState({ loading: true });
         try {
             await this.pluginStore.fetchPlugin(id);
