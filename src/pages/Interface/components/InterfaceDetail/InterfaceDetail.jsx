@@ -6,7 +6,7 @@ import { computed } from 'mobx';
 
 import ParamList from './component/ParamList';
 import TargetList from './component/TargetList';
-import PluginList from './component/PluginList';
+import ApiPluginList from './component/ApiPluginList';
 import './InterfaceDetail.scss';
 
 const { Row, Col } = Grid;
@@ -61,6 +61,8 @@ export default class InterfaceDetail extends Component {
     async fetchApi(id) {
         try {
             await this.apiStore.fetchApi(id);
+            const { apiGroupId } = this.apiStore.currentApi;
+            await this.apiStore.fetchApiGroup(apiGroupId);
         } catch (e) {
             Feedback.toast.error(e.message || '获取接口详情失败');
         }
@@ -146,7 +148,7 @@ export default class InterfaceDetail extends Component {
                 </div>
                 <ParamList />
                 <TargetList />
-                <PluginList />
+                <ApiPluginList />
             </div>
         );
     }

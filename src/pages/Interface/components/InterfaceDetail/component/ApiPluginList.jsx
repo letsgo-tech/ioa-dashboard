@@ -13,7 +13,7 @@ const { Row, Col } = Grid;
 
 @inject('stores')
 @observer
-export default class PluginList extends Component {
+export default class ApiPluginList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -121,6 +121,12 @@ export default class PluginList extends Component {
                     >
                         新增
                     </Button>
+                    <AddPluginOverlay
+                        visible={this.state.isAdding}
+                        updating={this.state.updating}
+                        onCloseOverlay={() => this.onCloseOverlay()}
+                        submit={plugin => this.addPlugin(plugin)}
+                    />
                 </div>
                 <div>
                     {
@@ -143,8 +149,8 @@ export default class PluginList extends Component {
                                                     <Col span="8" style={styles.pluginCol}>
                                                         {
                                                             item.config ?
-                                                                Object.keys(item.config).map((key, index) => (
-                                                                    <span key={index}>
+                                                                Object.keys(item.config).map((key, idx) => (
+                                                                    <span key={idx}>
                                                                         <IceLabel style={{ margin: '4px' }} inverse={false} status="primary">{key} : {item.config[key]}</IceLabel>
                                                                     </span>
                                                                 )) : '无'
@@ -195,12 +201,6 @@ export default class PluginList extends Component {
                                         );
                                     })
                                 }
-                                <AddPluginOverlay
-                                    visible={this.state.isAdding}
-                                    updating={this.state.updating}
-                                    onCloseOverlay={() => this.onCloseOverlay()}
-                                    submit={plugin => this.addPlugin(plugin)}
-                                />
                                 <EditPluginConfigOverlay
                                     visible={this.state.isEditing}
                                     updating={this.state.updating}

@@ -4,6 +4,8 @@ import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { Link } from 'react-router-dom';
+
+import GroupPluginList from './component/GroupPluginList';
 import './InterfaceGroupDetail.scss';
 
 const methods = [
@@ -229,6 +231,7 @@ export default class InterfaceGroupDetail extends Component {
                         }
                     </Table>
                 </div>
+                <GroupPluginList />
             </div>
         );
     }

@@ -20,7 +20,10 @@ export default class Interface extends Component {
     render() {
         return (
             <div className="interface-page">
-                <InterfaceGroupList />
+                <InterfaceGroupList
+                    onDeleteGroup={() => this.props.history.replace('/')}
+                    onDeleteApi={groupId => this.props.history.replace(`/interface/group/${groupId}`)}
+                />
                 <IceContainer style={{ flex: 1 }}>
                     <Switch>
                         <Route path="/interface" exact component={AllInterface} />
