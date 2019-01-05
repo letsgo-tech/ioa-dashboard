@@ -3,6 +3,7 @@ import {
     listApiGroup,
     fetchApiGroup,
     createApiGroup,
+    patchApiGroup,
     deleteApiGroup,
     createApi,
     fetchApi,
@@ -60,6 +61,16 @@ export default class ApiStore {
             this.apiGroups.push(res.data);
         } else {
             throw new Error('创建失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async patchApiGroup(id, params) {
+        const res = await patchApiGroup(id, params);
+        if (res.status === 200) {
+            this.currentGroup = Object.assign({}, this.currentGroup, params);
+        } else {
+            throw new Error('更新分组详情失败， 请稍后重试');
         }
     }
 

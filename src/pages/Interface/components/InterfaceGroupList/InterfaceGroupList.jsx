@@ -77,6 +77,7 @@ export default class InterfaceGroupList extends Component {
         try {
             await this.props.stores.apiStore.deleteApiGroup(id);
             Feedback.toast.success('删除分组成功');
+            this.props.onDeleteGroup();
         } catch (e) {
             Feedback.toast.error(e);
         }
@@ -86,6 +87,7 @@ export default class InterfaceGroupList extends Component {
         try {
             await this.props.stores.apiStore.deleteApi(groupId, apiId);
             Feedback.toast.success('删除接口成功');
+            this.props.onDeleteApi(groupId);
         } catch (e) {
             Feedback.toast.error(e);
         }
@@ -94,29 +96,20 @@ export default class InterfaceGroupList extends Component {
     renderItem = (item, idx) => {
         const { apiGroupId, id: currentApiId } = this.apiStore.currentApi;
         const { id: currentGroupId } = this.apiStore.currentGroup;
-        let openState;
 
-        if (this.state[`${item.id}`] === undefined) {
-            openState = !!this.state.searchStr
-                        || apiGroupId === item.id
-                        || currentGroupId === item.id;
-        } else {
-            openState = !!this.state.searchStr
-                        || this.state[`${item.id}`];
-        }
+        const openState = !!this.state.searchStr || currentGroupId === item.id;
 
         return (
             <div key={idx}>
                 <Link
                     to={`/interface/group/${item.id}`}
                     style={styles.treeCardItem}
-                    className={`tree-card-item ${(apiGroupId === item.id || currentGroupId === item.id) && 'selected'}`}
-                    onClick={() => this.setState({ [`${item.id}`]: !openState })}
+                    className={`tree-card-item ${currentGroupId === item.id && 'selected'}`}
+                    onClick={() => { }}
                 >
                     <span style={styles.tab}>{item.name}</span>
                     <span className="operate-btns">
-                        <span onClick={(e) => {
-                            e.stopPropagation();
+                        <span onClick={() => {
                             Dialog.confirm({
                                 title: `是否删除该分组：${item.name}`,
                                 content: '同时删除分组下接口，删除后将无法恢复',
