@@ -6,6 +6,7 @@ import { computed } from 'mobx';
 
 import ParamList from './component/ParamList';
 import TargetList from './component/TargetList';
+import PluginList from './component/PluginList';
 import './InterfaceDetail.scss';
 
 const { Row, Col } = Grid;
@@ -120,6 +121,7 @@ export default class InterfaceDetail extends Component {
                                 {
                                     this.state.isEdit ?
                                         <Select
+                                            style={{ width: '120px' }}
                                             dataSource={methods}
                                             value={this.state.method}
                                             onChange={method => this.setState({ method })}
@@ -144,11 +146,7 @@ export default class InterfaceDetail extends Component {
                 </div>
                 <ParamList />
                 <TargetList />
-
-                <div style={styles.secTitle}>
-                    <h5 style={styles.infoColumnTitle}>插件</h5>
-                    <Button size="small" type="primary">新增</Button>
-                </div>
+                <PluginList />
             </div>
         );
     }

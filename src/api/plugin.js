@@ -29,3 +29,8 @@ export async function putPlugin(id, params) {
     const res = await request.put(`/plugins/${id}`, params);
     return res;
 }
+
+export async function fetchConfigTpl(id) {
+    const res = await request.get(`/plugins/${id}/configTpl`);
+    return res;
+}

@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import {
     listApiGroup,
     fetchApiGroup,
@@ -13,22 +13,29 @@ import {
     patchParam,
     createTarget,
     deleteTarget,
-    patchTarget
+    patchTarget,
 } from '../api/interface';
 
 export default class ApiStore {
     @observable apiGroups = [];
     @observable currentGroup = {};
     @observable currentApi = {};
-    @observable params = [];
-    @observable targets = [];
+
+    @computed
+    get params() {
+        return this.currentApi.params || [];
+    }
+
+    @computed
+    get targets() {
+        return this.currentApi.targets || [];
+    }
 
     @action
     async listApiGroup() {
         try {
             const res = await listApiGroup();
             if (res.status === 200) {
-                console.log(res.data);
                 this.apiGroups = res.data.data || [];
             }
         } catch (e) {
@@ -95,8 +102,6 @@ export default class ApiStore {
         const res = await fetchApi(id);
         if (res.status === 200) {
             this.currentApi = res.data;
-            this.params = this.currentApi.params || [];
-            this.targets = this.currentApi.targets || [];
         } else {
             throw new Error('获取接口详情失败， 请稍后重试');
         }
