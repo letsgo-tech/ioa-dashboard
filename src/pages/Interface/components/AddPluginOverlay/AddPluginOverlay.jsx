@@ -16,8 +16,9 @@ export default class AddPluginOverlay extends Component {
         super(props);
         this.state = {
             loading: false,
+            currentPlugin: '',
             value: {},
-            selectedId: '',
+            selectedName: '',
         };
     }
 
@@ -31,44 +32,33 @@ export default class AddPluginOverlay extends Component {
         return this.pluginStore.plugins;
     }
 
-    @computed
-    get currentConfigTpls() {
-        return this.pluginStore.currentConfigTpls;
-    }
-
     componentDidMount() {
         this.pluginStore.listPlugin();
     }
 
-    async onSelected(id) {
-        this.setState({ selectedId: id, value: {} });
+    onSelected(name) {
+        this.setState({ selectedName: name, value: {} });
 
-        if (id === this.pluginStore.currentPlugin.id) return;
-        this.setState({ loading: true });
-        try {
-            await this.pluginStore.fetchPlugin(id);
-            await this.pluginStore.fetchConfigTpl(this.pluginStore.currentPlugin.name);
-        } catch (e) {
-            console.error(e.message);
-            Feedback.toast.error('获取插件失败，请稍后重试');
-        } finally {
-            this.setState({ loading: false });
+        for (let i = 0; i < this.plugins.length; i++) {
+            if (this.plugins[i].name === name) {
+                this.setState({ currentPlugin: this.plugins[i] });
+                return;
+            }
         }
     }
 
     onClose() {
         this.props.onCloseOverlay();
-        this.setState({ selectedId: '', value: {} });
+        this.setState({ selectedName: '', value: {} });
     }
 
     validateFields() {
         const { validateFields } = this.refs.form;
-        const { currentPlugin } = this.pluginStore;
+        const { currentPlugin } = this.state;
 
         validateFields(async (errors, values) => {
             if (!errors) {
                 const plugin = {
-                    id: currentPlugin.id,
                     name: currentPlugin.name,
                     config: values,
                 };
@@ -97,18 +87,18 @@ export default class AddPluginOverlay extends Component {
                         <span className="form-item-label">选择插件：</span>
                         <Select
                             style={{ width: '200px' }}
-                            onChange={id => this.onSelected(id)}
-                            value={this.state.selectedId}
+                            onChange={val => this.onSelected(val)}
+                            value={this.state.selectedName}
                         >
                             {
-                                this.plugins.slice().map(item => {
-                                    return <Option key={item.id} value={item.id}>{item.name}</Option>;
+                                this.plugins.slice().map((item, idx) => {
+                                    return <Option key={idx} value={item.name}>{item.name}</Option>;
                                 })
                             }
                         </Select>
                     </div>
                     {
-                        this.state.selectedId &&
+                        this.state.selectedName &&
                         <Loading shape="flower" tip="loading..." color="#666" visible={this.state.loading}>
                             <FormBinderWrapper
                                 value={this.state.value}
@@ -116,8 +106,9 @@ export default class AddPluginOverlay extends Component {
                                 key={Math.random()}
                             >
                                 {
-                                    this.currentConfigTpls.length &&
-                                    this.currentConfigTpls.slice().map((item, index) => {
+                                    this.state.currentPlugin &&
+                                    this.state.currentPlugin.configTpl.length &&
+                                    this.state.currentPlugin.configTpl.map((item, index) => {
                                         return (
                                             <div key={index}>
                                                 <div className="form-item">
@@ -152,7 +143,7 @@ export default class AddPluginOverlay extends Component {
                                 }
                             </FormBinderWrapper>
                             {
-                                this.state.selectedId &&
+                                this.state.selectedName &&
                                 <div style={{ textAlign: 'end', padding: '10px 0' }}>
                                     <Button type="normal" onClick={() => this.onClose()} style={{ marginRight: '10px' }}>
                                         取 消
