@@ -27,18 +27,14 @@ export default class EditPluginConfigOverlay extends Component {
     }
 
     @computed
-    get currentConfigTpls() {
-        return this.pluginStore.currentConfigTpls;
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.visible) {
-            try {
-                this.pluginStore.fetchConfigTpl(nextProps.name);
-            } catch (e) {
-                Feedback.toast.error('获取配置项失败');
+    get currentPlugin() {
+        for (let i = 0; i < this.plugins.length; i++) {
+            if (this.plugins[i].name === this.props.name) {
+                return this.plugins[i];
             }
         }
+
+        return {};
     }
 
     validateFields() {
@@ -54,11 +50,12 @@ export default class EditPluginConfigOverlay extends Component {
     }
 
     onClose() {
-        this.pluginStore.currentConfigTpls = [];
         this.props.onCloseOverlay();
     }
 
     render() {
+        console.log(this.plugins)
+        console.log(this.currentPlugin.config)
         return (
             <Overlay
                 visible={this.props.visible}
@@ -70,7 +67,8 @@ export default class EditPluginConfigOverlay extends Component {
             >
                 <div className="overlay-form-container">
                     {
-                        this.currentConfigTpls.length ?
+                        this.currentPlugin.configTpl &&
+                        this.currentPlugin.configTpl.length ?
                             <div>
                                 <h4 style={styles.header}>
                                     更改配置 ({this.props.name})
@@ -82,7 +80,7 @@ export default class EditPluginConfigOverlay extends Component {
                                         key={Math.random()}
                                     >
                                         {
-                                            this.currentConfigTpls.slice().map((item, index) => {
+                                            this.currentPlugin.configTpl.slice().map((item, index) => {
                                                 return (
                                                     <div key={index}>
                                                         <div className="form-item">

@@ -28,7 +28,7 @@ export default class Plugin extends Component {
     render() {
         return (
             <div className="plugin-page">
-                <FilterWithSearch />
+                {/* <FilterWithSearch /> */}
                 <ServiceCard />
             </div>
         );
