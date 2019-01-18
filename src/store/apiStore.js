@@ -10,12 +10,7 @@ import {
     fetchApi,
     deleteApi,
     patchApi,
-    createParam,
-    deleteParam,
-    patchParam,
-    createTarget,
-    deleteTarget,
-    patchTarget,
+    putApi,
 } from '../api/interface';
 
 export default class ApiStore {
@@ -132,15 +127,33 @@ export default class ApiStore {
     }
 
     @action
-    async patchApi(id, params) {
-        const res = await patchApi(id, params);
+    async putApi(api) {
+        const res = await putApi(api);
         if (res.status === 200) {
-            this.currentApi = Object.assign({}, this.currentApi, params);
+            this.currentApi = api;
         } else {
-            throw new Error('更新接口详情失败， 请稍后重试');
+            throw new Error('更新接口失败， 请稍后重试');
         }
     }
 
+    @action
+    async deleteApiById(id) {
+        const res = await deleteApi(id);
+        if (res.status === 200) {
+            for (let i = 0; i < this.apis.length; i++) {
+                const api = this.apis[i];
+                if (api.id === id) {
+                    this.apis.splice(i, 1);
+                }
+            }
+        } else {
+            throw new Error('删除失败， 请稍后重试');
+        }
+    }
+
+    // deprecated
+
+    // delete api from apisGroup list, could be removed soon
     @action
     async deleteApi(groupId, apiId) {
         const res = await deleteApi(apiId);
@@ -157,17 +170,12 @@ export default class ApiStore {
     }
 
     @action
-    async deleteApiById(id) {
-        const res = await deleteApi(id);
+    async patchApi(id, params) {
+        const res = await patchApi(id, params);
         if (res.status === 200) {
-            for (let i = 0; i < this.apis.length; i++) {
-                const api = this.apis[i];
-                if (api.id === id) {
-                    this.apis.splice(i, 1);
-                }
-            }
+            this.currentApi = Object.assign({}, this.currentApi, params);
         } else {
-            throw new Error('删除失败， 请稍后重试');
+            throw new Error('更新接口详情失败， 请稍后重试');
         }
     }
 
@@ -190,6 +198,7 @@ export default class ApiStore {
         }
     }
 
+
     removeApiFromGroup(group, apiId) {
         if (group.apis instanceof Array) {
             for (let i = 0; i < group.apis.length; i++) {
@@ -197,45 +206,6 @@ export default class ApiStore {
                     return group.apis.splice(i, 1)[0];
                 }
             }
-        }
-    }
-
-    /* apiDetail */
-    @action
-    async createParam(param) {
-        const res = await createParam(param);
-        if (res.status === 200) {
-            this.params.push(res.data);
-        } else {
-            throw new Error('创建参数失败， 请稍后重试');
-        }
-    }
-
-    @action
-    async patchParam(id, param) {
-        const res = await patchParam(id, param);
-        if (res.status === 200) {
-            for (let i = 0; i < this.params.length; i++) {
-                if (this.params[i].id === id) {
-                    this.params[i] = Object.assign({}, this.params[i], param);
-                }
-            }
-        } else {
-            throw new Error('更新参数失败， 请稍后重试');
-        }
-    }
-
-    @action
-    async deleteParam(id) {
-        const res = await deleteParam(id);
-        if (res.status === 200) {
-            for (let i = 0; i < this.params.length; i++) {
-                if (this.params[i].id === id) {
-                    this.params.splice(i, 1);
-                }
-            }
-        } else {
-            throw new Error('删除参数失败， 请稍后重试');
         }
     }
 

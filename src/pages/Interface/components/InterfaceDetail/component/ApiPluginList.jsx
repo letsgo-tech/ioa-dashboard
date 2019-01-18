@@ -88,10 +88,11 @@ export default class ApiPluginList extends Component {
     }
 
     async updateApiPlugin(plugins) {
-        const { id } = this.apiStore.currentApi;
+        const { currentApi } = this.apiStore;
+        currentApi.plugins = JSON.stringify(plugins);
         try {
             this.setState({ updating: true });
-            await this.apiStore.patchApi(id, { plugins: JSON.stringify(plugins) });
+            await this.apiStore.putApi(currentApi);
             this.setState({ updating: false, isAdding: false });
         } catch (e) {
             this.setState({ updating: false });
