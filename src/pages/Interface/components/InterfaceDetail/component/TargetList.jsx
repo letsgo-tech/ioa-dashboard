@@ -61,6 +61,10 @@ export default class TargetList extends Component {
 
         validateFields(async (errors, values) => {
             if (!errors) {
+                if (!(currentApi.targets instanceof Array)) {
+                    currentApi.targets = [];
+                }
+
                 try {
                     this.setState({ loading: true });
                     if (this.state.isCreating) {
