@@ -62,7 +62,7 @@ export default class InterfaceDetail extends Component {
         try {
             await this.apiStore.fetchApi(id);
             const { apiGroupId } = this.apiStore.currentApi;
-            await this.apiStore.fetchApiGroup(apiGroupId);
+            //await this.apiStore.fetchApiGroup(apiGroupId);
         } catch (e) {
             Feedback.toast.error(e.message || '获取接口详情失败');
         }
@@ -90,6 +90,23 @@ export default class InterfaceDetail extends Component {
         this.setState({ isEdit: true, name, method, path });
     }
 
+    onDelete() {
+        const { id, name } = this.apiStore.currentApi;
+        Dialog.confirm({
+            content: `是否删除${name}`,
+            title: '删除接口',
+            onOk: async () => {
+                try {
+                    await this.props.stores.apiStore.deleteApiById(id);
+                    Feedback.toast.success('删除接口成功');
+                    this.props.history.replace('/');
+                } catch (e) {
+                    Feedback.toast.error('删除接口失败');
+                }
+            },
+        });
+    }
+
     render() {
         const { currentApi } = this.apiStore;
         return (
@@ -105,7 +122,10 @@ export default class InterfaceDetail extends Component {
                                     <Button size="small" onClick={() => this.setState({ isEdit: false })}>取消</Button>
                                     <Button size="small" type="primary" loading={this.state.isLoading} onClick={() => this.updateApi()}>提交</Button>
                                 </div> :
-                                <Button size="small" type="primary" onClick={() => this.onEdit()}>编辑</Button>
+                                <div>
+                                    <Button size="small" type="secondary" onClick={() => this.onDelete()} style={{ marginRight: '6px' }}>删除</Button>
+                                    <Button size="small" type="primary" onClick={() => this.onEdit()}>编辑</Button>
+                                </div>
                         }
                     </div>
                     <Row wrap style={styles.infoItems}>

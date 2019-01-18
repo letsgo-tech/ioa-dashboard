@@ -5,6 +5,7 @@ import {
     createApiGroup,
     patchApiGroup,
     deleteApiGroup,
+    listApi,
     createApi,
     fetchApi,
     deleteApi,
@@ -20,6 +21,7 @@ import {
 export default class ApiStore {
     @observable apiGroups = [];
     @observable currentGroup = {};
+    @observable apis = [];
     @observable currentApi = {};
 
     @computed
@@ -90,19 +92,30 @@ export default class ApiStore {
     }
 
     @action
+    async listApi() {
+        const res = await listApi();
+        if (res.status === 200) {
+            this.apis = res.data.data;
+        } else {
+            throw new Error('获取api失败， 请稍后重试');
+        }
+    }
+
+    @action
     async createApi(params) {
         const res = await createApi(params);
         if (res.status === 200) {
-            if (!(this.currentGroup.apis instanceof Array)) {
-                this.currentGroup.apis = [];
-            }
-            this.currentGroup.apis.push(res.data);
-            for (let i = 0; i < this.apiGroups.length; i++) {
-                if (this.apiGroups[i].id === this.currentGroup.id) {
-                    this.apiGroups[i].apis.push(res.data);
-                    return;
-                }
-            }
+            // if (!(this.currentGroup.apis instanceof Array)) {
+            //     this.currentGroup.apis = [];
+            // }
+            // this.currentGroup.apis.push(res.data);
+            // for (let i = 0; i < this.apiGroups.length; i++) {
+            //     if (this.apiGroups[i].id === this.currentGroup.id) {
+            //         this.apiGroups[i].apis.push(res.data);
+            //         return;
+            //     }
+            // }
+            this.apis.unshift(res.data);
         } else {
             throw new Error('创建接口失败， 请稍后重试');
         }
@@ -136,6 +149,21 @@ export default class ApiStore {
                 const group = this.apiGroups[i];
                 if (group.id === groupId) {
                     this.removeApiFromGroup(group, apiId);
+                }
+            }
+        } else {
+            throw new Error('删除失败， 请稍后重试');
+        }
+    }
+
+    @action
+    async deleteApiById(id) {
+        const res = await deleteApi(id);
+        if (res.status === 200) {
+            for (let i = 0; i < this.apis.length; i++) {
+                const api = this.apis[i];
+                if (api.id === id) {
+                    this.apis.splice(i, 1);
                 }
             }
         } else {
