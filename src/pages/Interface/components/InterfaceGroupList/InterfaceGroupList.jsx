@@ -36,7 +36,7 @@ export default class InterfaceGroupList extends Component {
 
     async componentDidMount() {
         const { apiStore } = this.props.stores;
-        await apiStore.listApiGroup();
+        //await apiStore.listApiGroup();
     }
 
     componentWillUnmount() { }
