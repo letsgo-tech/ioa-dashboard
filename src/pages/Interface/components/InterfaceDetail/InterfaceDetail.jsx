@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Dialog, Grid, Tag, Select, Table } from '@icedesign/base';
-import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
+import { Button, Input, Feedback, Dialog, Grid, Tag, Select } from '@icedesign/base';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
 
-import ParamList from './component/ParamList';
 import TargetList from './component/TargetList';
 import ApiPluginList from './component/ApiPluginList';
 import './InterfaceDetail.scss';
@@ -166,7 +164,6 @@ export default class InterfaceDetail extends Component {
                         </Col>
                     </Row>
                 </div>
-                <ParamList />
                 <TargetList />
                 <ApiPluginList />
             </div>

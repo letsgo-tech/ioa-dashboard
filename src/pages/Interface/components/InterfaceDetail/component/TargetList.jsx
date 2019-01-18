@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Dialog, Select, Table } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Feedback, Select, Table } from '@icedesign/base';
 import BalloonConfirm from '@icedesign/balloon-confirm';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
@@ -17,8 +17,8 @@ const methods = [
 ];
 
 const schemes = [
-    { label: 'HTTP', value: 'http' },
-    { label: 'HTTPS', value: 'https' },
+    { label: 'HTTP', value: 'http://' },
+    { label: 'HTTPS', value: 'https://' },
 ];
 
 @inject('stores')
@@ -30,15 +30,15 @@ export default class TargetList extends Component {
             visible: false,
             loading: false,
             isCreating: false,
-            isPatching: false,
+            isPuting: false,
             value: {
                 method: '',
-                scheme: 'http',
+                scheme: 'http://',
                 host: '',
                 port: '',
                 path: '/',
             },
-            currentTargetId: '',
+            currentTargetIndex: '',
         };
     }
 
@@ -48,8 +48,8 @@ export default class TargetList extends Component {
         this.setState({
             visible: false,
             isCreating: false,
-            isPatching: false,
-            value: { method: '', scheme: 'http', host: '', port: '', path: '/' },
+            isPuting: false,
+            value: { method: '', scheme: 'http://', host: '', port: '', path: '/' },
         });
     }
 
@@ -57,19 +57,21 @@ export default class TargetList extends Component {
         const { validateFields } = this.refs.form;
         const { apiStore } = this.props.stores;
         const { currentApi } = apiStore;
-        const { currentTargetId } = this.state;
+        const { currentTargetIndex } = this.state;
 
         validateFields(async (errors, values) => {
             if (!errors) {
                 try {
                     this.setState({ loading: true });
                     if (this.state.isCreating) {
-                        await apiStore.createTarget({ apiId: currentApi.id, ...values });
+                        currentApi.targets.push(values);
                     }
 
-                    if (this.state.isPatching) {
-                        await apiStore.patchTarget(currentTargetId, values);
+                    if (this.state.isPuting) {
+                        currentApi.targets[currentTargetIndex] = values;
                     }
+
+                    await apiStore.putApi(currentApi);
                     this.setState({ loading: false, visible: false });
                     this.onCloseOverlay();
                 } catch (e) {
@@ -177,12 +179,13 @@ export default class TargetList extends Component {
 
     renderOperateCell = (val, index, record) => {
         const { apiStore } = this.props.stores;
-        const { id, method, scheme, host, port, path } = record;
+        const { currentApi } = apiStore;
+        const { method, scheme, host, port, path } = record;
 
         return (
             <span>
                 <a onClick={() => {
-                    this.setState({ visible: true, isCreating: false, isPatching: true, value: { method, scheme, host, port, path }, currentTargetId: id });
+                    this.setState({ visible: true, isCreating: false, isPuting: true, value: { method, scheme, host, port, path }, currentTargetIndex: index });
                 }}
                 >
                     编辑
@@ -191,12 +194,13 @@ export default class TargetList extends Component {
                 <BalloonConfirm
                     onConfirm={async () => {
                         try {
-                            await apiStore.deleteTarget(record.id);
+                            currentApi.targets.splice(index, 1);
+                            await apiStore.putApi(currentApi);
                         } catch (e) {
                             Feedback.toast.error(e.message || '删除失败， 请稍后重试');
                         }
                     }}
-                    title={`删除 ${scheme}://${host}${port && ':'}${port}${path}`}
+                    title={`删除 ${scheme}${host}${port && ':'}${port}${path}`}
                 ><span>删除</span>
                 </BalloonConfirm>
             </span>
@@ -206,7 +210,7 @@ export default class TargetList extends Component {
     renderFullPath = (val, index, record) => {
         const { scheme, host, port, path } = record;
         return (
-            <span>{`${scheme}://${host}${port && ':'}${port}${path}`}</span>
+            <span>{`${scheme}${host}${port && ':'}${port}${path}`}</span>
         );
     }
 
@@ -221,7 +225,7 @@ export default class TargetList extends Component {
                         size="small"
                         type="primary"
                         onClick={() => {
-                            this.setState({ visible: true, isCreating: true, isPatching: false, value: { method: currentApi.method, scheme: 'http', host: '', port: '', path: '/' } });
+                            this.setState({ visible: true, isCreating: true, isPuting: false, value: { method: currentApi.method, scheme: 'http://', host: '', port: '', path: '/' } });
                         }}
                     >
                         新增
