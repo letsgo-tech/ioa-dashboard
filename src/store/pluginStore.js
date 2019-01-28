@@ -1,20 +1,34 @@
 import { observable, action, computed } from 'mobx';
 import {
-    listPlugin,
+    listPluginsWithTag,
+    listPlugins,
     fetchPlugin,
     fetchConfigTpl,
 } from '../api/plugin';
 
 export default class PluginStore {
-    @observable plugins = [];
+    @observable allPlugins = [];
     @observable currentPlugin = {};
+    @observable tagPlugins = {};
+
+    @action
+    async listPluginsWithTag() {
+        try {
+            const res = await listPluginsWithTag();
+            if (res.status === 200) {
+                this.tagPlugins = res.data.data;
+            }
+        } catch (e) {
+            throw e;
+        }
+    }
 
     @action
     async listPlugin() {
         try {
-            const res = await listPlugin();
+            const res = await listPlugins();
             if (res.status === 200) {
-                this.plugins = res.data.data || [];
+                this.allPlugins = res.data.data || [];
             }
         } catch (e) {
             throw e;

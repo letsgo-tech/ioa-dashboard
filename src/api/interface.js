@@ -30,6 +30,11 @@ export async function putApiGroup(id, params) {
     return res;
 }
 
+export async function listApisWithTag() {
+    const res = await request.get('/apisWithTag');
+    return res;
+}
+
 export async function listApi() {
     const res = await request.get('/apis');
     return res;

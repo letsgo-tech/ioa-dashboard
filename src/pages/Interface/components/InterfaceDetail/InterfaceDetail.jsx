@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Feedback, Dialog, Grid, Tag, Select } from '@icedesign/base';
+import { Button, Input, Message, Dialog, Grid, Tag, Select } from '@alifd/next';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
 
@@ -62,7 +62,7 @@ export default class InterfaceDetail extends Component {
             const { apiGroupId } = this.apiStore.currentApi;
             //await this.apiStore.fetchApiGroup(apiGroupId);
         } catch (e) {
-            Feedback.toast.error(e.message || '获取接口详情失败');
+            Message.error('获取接口详情失败');
         }
     }
 
@@ -79,7 +79,7 @@ export default class InterfaceDetail extends Component {
             this.setState({ isLoading: false, isEdit: false });
         } catch (e) {
             this.setState({ isLoading: false });
-            Feedback.toast.error(e.message || '更新接口失败， 请稍后重试');
+            Message.error('更新接口失败， 请稍后重试');
         }
     }
 
@@ -96,10 +96,10 @@ export default class InterfaceDetail extends Component {
             onOk: async () => {
                 try {
                     await this.props.stores.apiStore.deleteApiById(id);
-                    Feedback.toast.success('删除接口成功');
+                    Message.success('删除接口成功');
                     this.props.history.replace('/');
                 } catch (e) {
-                    Feedback.toast.error('删除接口失败');
+                    Message.error('删除接口失败');
                 }
             },
         });
@@ -117,12 +117,12 @@ export default class InterfaceDetail extends Component {
                         {
                             this.state.isEdit ?
                                 <div>
-                                    <Button size="small" onClick={() => this.setState({ isEdit: false })}>取消</Button>
-                                    <Button size="small" type="primary" loading={this.state.isLoading} onClick={() => this.updateApi()}>提交</Button>
+                                    <Button size="medium" onClick={() => this.setState({ isEdit: false })} style={{ marginRight: '6px' }}>取消</Button>
+                                    <Button size="medium" type="primary" loading={this.state.isLoading} onClick={() => this.updateApi()}>提交</Button>
                                 </div> :
                                 <div>
-                                    <Button size="small" type="secondary" onClick={() => this.onDelete()} style={{ marginRight: '6px' }}>删除</Button>
-                                    <Button size="small" type="primary" onClick={() => this.onEdit()}>编辑</Button>
+                                    <Button size="medium" type="secondary" onClick={() => this.onDelete()} style={{ marginRight: '6px' }}>删除</Button>
+                                    <Button size="medium" type="primary" onClick={() => this.onEdit()}>编辑</Button>
                                 </div>
                         }
                     </div>
@@ -146,7 +146,7 @@ export default class InterfaceDetail extends Component {
                                             value={this.state.method}
                                             onChange={method => this.setState({ method })}
                                         /> :
-                                        <Tag shape="readonly" size="medium" className={`${currentApi.method}-tag`} style={{ color: '#666' }}>{ currentApi.method }</Tag>
+                                        <Tag type="primary" size="small" className={`${currentApi.method}-tag`} style={{ color: '#666' }}>{ currentApi.method }</Tag>
                                 }
                             </span>
                         </Col>

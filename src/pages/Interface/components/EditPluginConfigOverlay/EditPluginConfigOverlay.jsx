@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Overlay, Loading, Input, Balloon, Button, Feedback } from '@icedesign/base';
+import { Icon, Overlay, Loading, Input, Balloon, Button, Message } from '@alifd/next';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
 import { inject, observer } from 'mobx-react';
@@ -23,7 +23,7 @@ export default class EditPluginConfigOverlay extends Component {
 
     @computed
     get plugins() {
-        return this.pluginStore.plugins;
+        return this.pluginStore.allPlugins;
     }
 
     @computed
@@ -54,8 +54,6 @@ export default class EditPluginConfigOverlay extends Component {
     }
 
     render() {
-        console.log(this.plugins)
-        console.log(this.currentPlugin.config)
         return (
             <Overlay
                 visible={this.props.visible}

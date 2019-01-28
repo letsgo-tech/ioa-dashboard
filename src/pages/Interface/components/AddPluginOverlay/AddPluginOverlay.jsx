@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Overlay, Loading, Input, Select, Feedback, Balloon, Button } from '@icedesign/base';
+import { Icon, Overlay, Loading, Input, Select, Message, Balloon, Button } from '@alifd/next';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
 import { inject, observer } from 'mobx-react';
@@ -29,7 +29,7 @@ export default class AddPluginOverlay extends Component {
 
     @computed
     get plugins() {
-        return this.pluginStore.plugins;
+        return this.pluginStore.allPlugins;
     }
 
     componentDidMount() {

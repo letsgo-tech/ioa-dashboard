@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '@icedesign/layout';
 import Menu from '@icedesign/menu';
-import { Icon, Balloon } from '@icedesign/base';
+import { Icon, Balloon } from '@alifd/next';
 import { Link, withRouter } from 'react-router-dom';
 import { asideMenuConfig } from '../../../../menuConfig';
 import Logo from '../Logo';
@@ -38,7 +38,7 @@ class Header extends React.Component {
                 triggerType="click"
                 trigger={trigger}
                 align="br"
-                alignment="edge"
+                alignEdge
                 closable={false}
                 className="ice-header-balloon"
                 style={{ width: '80px' }}

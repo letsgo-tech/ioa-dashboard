@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid } from '@icedesign/base';
+import { Grid } from '@alifd/next';
 import IceContainer from '@icedesign/container';
 
 import { inject, observer } from 'mobx-react';
@@ -21,27 +21,23 @@ export default class ServiceCard extends Component {
         this.state = { };
     }
 
-    @computed
-    get pluginStore() {
-        return this.props.stores.pluginStore;
-    }
-
     render() {
-        const { plugins } = this.pluginStore;
         return (
             <Row wrap gutter="20">
-                {plugins.map((item, index) => {
-                    return (
-                        <Col l="8" key={index}>
-                            <IceContainer style={styles.container}>
-                                <div style={styles.body}>
-                                    <h4 style={styles.name}>{item.name}</h4>
-                                    <p style={styles.desc}>{item.describe}</p>
-                                </div>
-                            </IceContainer>
-                        </Col>
-                    );
-                })}
+                {
+                    this.props.plugins instanceof Array &&
+                    this.props.plugins.map((item, index) => {
+                        return (
+                            <Col l="8" key={index}>
+                                <IceContainer style={styles.container}>
+                                    <div style={styles.body}>
+                                        <h4 style={styles.name}>{item.name}</h4>
+                                        <p style={styles.desc}>{item.describe}</p>
+                                    </div>
+                                </IceContainer>
+                            </Col>
+                        );
+                    })}
             </Row>
         );
     }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Dialog, Select, Table } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Message, Dialog, Select, Table } from '@alifd/next';
 import BalloonConfirm from '@icedesign/balloon-confirm';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
@@ -53,7 +53,7 @@ export default class ParamList extends Component {
                     this.onCloseOverlay();
                 } catch (e) {
                     this.setState({ loading: false });
-                    Feedback.toast.error(e.message || '添加参数失败， 请稍后重试');
+                    Message.error('添加参数失败， 请稍后重试');
                 }
             }
         });
@@ -164,7 +164,7 @@ export default class ParamList extends Component {
                         try {
                             await apiStore.deleteParam(record.id);
                         } catch (e) {
-                            Feedback.toast.error(e.message || '删除失败， 请稍后重试');
+                            Message.error('删除失败， 请稍后重试');
                         }
                     }}
                     title={`删除${record.name}`}

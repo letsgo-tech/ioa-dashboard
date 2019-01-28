@@ -1,4 +1,4 @@
-import { Feedback } from '@icedesign/base';
+import { Message } from '@alifd/next';
 import { observable, action } from 'mobx';
 import { login, postUserLogout, postUserRegister } from '../api/user';
 
@@ -32,13 +32,13 @@ export default class UserStore {
             if (status === 200) {
                 this.token = data.token;
                 localStorage.setItem('authToken', data.token);
-                Feedback.toast.success('登录成功');
+                Message.success('登录成功');
             } else {
-                Feedback.toast.error('登录失败， 请检查账号密码');
+                Message.error('登录失败， 请检查账号密码');
                 throw new Error('登录失败， 请检查账号密码');
             }
         } catch (error) {
-            Feedback.toast.error('登录失败，请稍后重试');
+            Message.error('登录失败，请稍后重试');
             throw new Error('登录失败，请稍后重试');
         }
     }
@@ -47,7 +47,7 @@ export default class UserStore {
     userLogout = async () => {
         try {
             this.clearToken();
-            Feedback.toast.success('已登出');
+            Message.success('已登出');
         } catch (error) {
             throw error;
         }
@@ -58,13 +58,13 @@ export default class UserStore {
         try {
             const res = await postUserRegister(params);
             if (res.data.status === 200) {
-                Feedback.toast.success('注册成功');
+                Message.success('注册成功');
             } else {
-                Feedback.toast.error('注册失败， 请检查账号密码');
+                Message.error('注册失败， 请检查账号密码');
                 throw new Error('注册失败， 请检查账号密码');
             }
         } catch (error) {
-            Feedback.toast.error('注册失败， 稍后重试');
+            Message.error('注册失败， 稍后重试');
             throw new Error('注册失败， 稍后重试');
         }
     }
