@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Feedback, Icon, Grid } from '@icedesign/base';
+import { Button, Message, Icon, Grid } from '@alifd/next';
 import BalloonConfirm from '@icedesign/balloon-confirm';
 import IceLabel from '@icedesign/label';
 
@@ -95,7 +95,7 @@ export default class GroupPluginList extends Component {
             this.setState({ updating: false, isAdding: false });
         } catch (e) {
             this.setState({ updating: false });
-            Feedback.toast.error(e.message || '添加插件失败，请稍后重试');
+            Message.error('添加插件失败，请稍后重试');
             throw e;
         }
     }

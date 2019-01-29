@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Tag, Select, Table } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Message, Tag, Select, Table } from '@alifd/next';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -70,7 +70,7 @@ export default class InterfaceGroupDetail extends Component {
         try {
             await this.apiStore.fetchApiGroup(id);
         } catch (e) {
-            Feedback.toast.error(e.message || '获取分组失败');
+            Message.error('获取分组失败');
         }
     }
 
@@ -84,11 +84,11 @@ export default class InterfaceGroupDetail extends Component {
                     this.setState({ isCreating: true });
                     await apiStore.createApi(Object.assign({}, values, { apiGroupId: apiStore.currentGroup.id }));
                     this.setState({ isCreating: false, visible: false });
-                    Feedback.toast.success('添加接口成功');
+                    Message.success('添加接口成功');
                     this.setState({ value: { apiGroupId: '', name: '', method: 'get', path: '' } });
                 } catch (e) {
                     this.setState({ isCreating: false });
-                    Feedback.toast.error(e.message || '添加接口失败， 请稍后重试');
+                    Message.error('添加接口失败， 请稍后重试');
                 }
             }
         });
@@ -205,7 +205,7 @@ export default class InterfaceGroupDetail extends Component {
                         try {
                             this.apiStore.changeGroup(apiId, currentGroupId, value);
                         } catch (e) {
-                            Feedback.toast.error(e || '操作失败');
+                            Message.error('操作失败');
                         }
                     }}
                 />

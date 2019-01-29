@@ -1,19 +1,21 @@
 /* eslint react/no-string-refs:0 */
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Dialog } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Message, Menu, Dialog } from '@alifd/next';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 import IceContainer from '@icedesign/container';
 import FoundationSymbol from '@icedesign/foundation-symbol';
+import { Link } from 'react-router-dom';
 
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
-import { Link } from 'react-router-dom';
-import './InterfaceGroupList.scss';
+import './InterfaceTagList.scss';
+
+const { SubMenu, Item } = Menu;
 
 @inject('stores')
 @observer
-export default class InterfaceGroupList extends Component {
-    static displayName = 'InterfaceGroupList';
+export default class InterfaceTagList extends Component {
+    static displayName = 'InterfaceTagList';
 
     static propTypes = {};
 
@@ -36,7 +38,7 @@ export default class InterfaceGroupList extends Component {
 
     async componentDidMount() {
         const { apiStore } = this.props.stores;
-        //await apiStore.listApiGroup();
+        await apiStore.listApisWithTag();
     }
 
     componentWillUnmount() { }
@@ -51,108 +53,93 @@ export default class InterfaceGroupList extends Component {
     }
 
     @computed
-    get getApiGroups() {
-        const { apiGroups } = this.props.stores.apiStore;
+    get getTags() {
+        const { tags } = this.props.stores.apiStore;
         const { searchStr } = this.state;
-        if (!searchStr) return apiGroups;
-        const groups = [];
-        apiGroups.forEach(item => {
-            if (item.name.indexOf(searchStr) > -1) {
-                return groups.push(item);
+        if (!searchStr) return tags;
+        const t = {};
+        Object.keys(tags).forEach(key => {
+            const item = tags[key];
+            if (key.indexOf(searchStr) > -1) {
+                return t[key] = item;
             }
 
-            if (!(item.apis instanceof Array)) return;
+            if (!(item instanceof Array)) return;
 
-            const apis = item.apis.filter(api => {
+            const apis = item.filter(api => {
                 return api.name.indexOf(searchStr) > -1;
             });
 
-            if (apis.length) return groups.push(Object.assign({}, item, { apis }));
+            if (apis.length) return t[key] = apis;
         });
 
-        return groups;
+        return t;
     }
 
     deleteApiGroup = async (id) => {
         try {
             await this.props.stores.apiStore.deleteApiGroup(id);
-            Feedback.toast.success('删除分组成功');
+            Message.success('删除分组成功');
             this.props.onDeleteGroup();
         } catch (e) {
-            Feedback.toast.error(e);
+            Message.error('删除分组失败');
         }
     }
 
     deleteApi = async (groupId, apiId) => {
         try {
             await this.props.stores.apiStore.deleteApi(groupId, apiId);
-            Feedback.toast.success('删除接口成功');
+            Message.success('删除接口成功');
             this.props.onDeleteApi(groupId);
         } catch (e) {
-            Feedback.toast.error(e);
+            Message.error('删除接口失败');
         }
     }
 
-    renderItem = (item, idx) => {
-        const { apiGroupId, id: currentApiId } = this.apiStore.currentApi;
-        const { id: currentGroupId } = this.apiStore.currentGroup;
-
-        const openState = !!this.state.searchStr || currentGroupId === item.id;
+    renderTags = () => {
+        const { id: currentApiId } = this.apiStore.currentApi;
 
         return (
-            <div key={idx}>
-                <Link
-                    to={`/interface/group/${item.id}`}
-                    style={styles.treeCardItem}
-                    className={`tree-card-item ${currentGroupId === item.id && 'selected'}`}
-                    onClick={() => { }}
-                >
-                    <span style={styles.tab}>{item.name}</span>
-                    <span className="operate-btns">
-                        <span onClick={() => {
-                            Dialog.confirm({
-                                title: `是否删除该分组：${item.name}`,
-                                content: '同时删除分组下接口，删除后将无法恢复',
-                                onOk: () => this.deleteApiGroup(item.id),
-                            });
-                        }}
-                        >
-                            <FoundationSymbol type="delete" size="small" />
-                        </span>
-                    </span>
-                </Link>
+            <Menu className="my-menu" style={{ border: 0 }}>
                 {
-                    openState && item.apis ?
-                        <div className="api-item-list">
-                            {item.apis.map((api, index) => {
-                                return (
-                                    <Link
-                                        className={`api-item ${currentApiId === api.id && 'selected'}`}
-                                        key={index}
-                                        to={`/interface/api/${api.id}`}
-                                    >
-                                        <span>
-                                            {api.name}
-                                        </span>
-                                        <span className="operate-btns">
-                                            <span onClick={() => {
-                                                Dialog.confirm({
-                                                    title: `是否删除该接口：${api.name}`,
-                                                    content: '删除后将无法恢复',
-                                                    onOk: () => this.deleteApi(item.id, api.id),
-                                                });
-                                            }}
-                                            >
-                                                <FoundationSymbol type="delete" size="small" />
-                                            </span>
-                                        </span>
-                                    </Link>
-                                );
-                            })}
-                        </div> :
-                        ''
+                    Object.keys(this.getTags).map((key, index) => {
+                        const apis = this.getTags[key];
+                        return (
+                            <SubMenu key={index} label={<span style={{ fontSize: '14px' }}>{key}</span>}>
+                                {
+                                    apis.map((api, idx) => {
+                                        return (
+                                            <Item key={`${index}-${idx}`}>
+                                                <Link
+                                                    className={`api-item ${currentApiId === api.id && 'selected'}`}
+                                                    key={index}
+                                                    to={`/interface/api/${api.id}`}
+                                                >
+                                                    <span>
+                                                        {api.name}
+                                                    </span>
+                                                    {/* <span className="operate-btns" style={{ display: 'inline-block', width: '32px' }}>
+                                                        <span onClick={() => {
+                                                            Dialog.confirm({
+                                                                title: `是否删除该接口：${api.name}`,
+                                                                content: '删除后将无法恢复',
+                                                                onOk: () => this.deleteApi(item.id, api.id),
+                                                            });
+                                                        }}
+                                                        >
+                                                            <FoundationSymbol type="delete" size="small" />
+                                                        </span>
+                                                    </span> */}
+                                                </Link>
+                                            </Item>
+                                        );
+                                    })
+                                }
+                            </SubMenu>
+                        );
+                    })
                 }
-            </div>
+            </Menu>
         );
     };
 
@@ -165,11 +152,11 @@ export default class InterfaceGroupList extends Component {
                     this.setState({ isCreating: true });
                     await this.props.stores.apiStore.createApiGroup(values);
                     this.setState({ isCreating: false, visible: false });
-                    Feedback.toast.success('创建分组成功');
+                    Message.success('创建分组成功');
                     this.setState({ value: { name: '', describe: '' } });
                 } catch (error) {
                     this.setState({ isCreating: false });
-                    Feedback.toast.error('创建失败， 请稍后重试');
+                    Message.error('创建失败， 请稍后重试');
                 }
             }
         });
@@ -187,7 +174,7 @@ export default class InterfaceGroupList extends Component {
             >
                 <Loading shape="flower" tip="creating..." color="#666" visible={this.state.isCreating}>
                     <div style={styles.formContainer}>
-                        <h4 style={{ paddingTop: '10px' }}>新增分组</h4>
+                        <h4 style={{ paddingTop: '10px' }}>新增Tag</h4>
                         <FormBinderWrapper
                             value={this.state.value}
                             onChange={value => this.setState({ value })}
@@ -237,21 +224,22 @@ export default class InterfaceGroupList extends Component {
 
     render() {
         return (
-            <div className="tree-card-list" style={styles.InterfaceGroupList}>
+            <div className="tree-card-list" style={styles.InterfaceTagList}>
                 <IceContainer>
                     <div style={styles.firstRow}>
-                        <span>接口列表</span>
-                        <Button type="primary" ref="target" size="small" onClick={() => this.setState({ visible: true })}>
-                            新增分组
+                        <span>标签列表</span>
+                        {/* <Button type="primary" ref="target" size="small" onClick={() => this.setState({ visible: true })}>
+                            新增Tag
                         </Button>
-                        { this.renderOverlay() }
+                        { this.renderOverlay() } */}
                     </div>
                     <Input
-                        hasClear
-                        placeholder="搜索接口"
+                        style={{ width: '100%' }}
+                        hasClear={true}
+                        placeholder="搜索标签/接口"
                         onChange={val => this.onSearchChange(val)}
                     />
-                    {this.getApiGroups.map(this.renderItem)}
+                    {this.renderTags()}
                 </IceContainer>
             </div>
         );

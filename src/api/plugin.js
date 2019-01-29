@@ -1,6 +1,11 @@
 import request from '../util/request';
 
-export async function listPlugin() {
+export async function listPluginsWithTag() {
+    const res = await request.get('/pluginsWithTag?order=created_at:asc');
+    return res;
+}
+
+export async function listPlugins() {
     const res = await request.get('/plugins?order=created_at:asc');
     return res;
 }

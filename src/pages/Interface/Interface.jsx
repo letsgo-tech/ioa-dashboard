@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import IceContainer from '@icedesign/container';
-import InterfaceGroupList from './components/InterfaceGroupList';
+import InterfaceTagList from './components/InterfaceTagList';
 import AllInterface from './components/AllInterface';
 import InterfaceGroupDetail from './components/InterfaceGroupDetail';
 import InterfaceDetail from './components/InterfaceDetail';
@@ -20,9 +20,9 @@ export default class Interface extends Component {
     render() {
         return (
             <div className="interface-page">
-                <InterfaceGroupList
-                    onDeleteGroup={() => this.props.history.replace('/')}
-                    onDeleteApi={groupId => this.props.history.replace(`/interface/group/${groupId}`)}
+                <InterfaceTagList
+                    onDeleteTag={() => this.props.history.replace('/')}
+                    onDeleteApi={tagId => this.props.history.replace(`/interface/group/${tagId}`)}
                 />
                 <IceContainer style={{ flex: 1 }}>
                     <Switch>

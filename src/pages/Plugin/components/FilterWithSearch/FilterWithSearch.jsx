@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import IceContainer from '@icedesign/container';
-import { Input, Grid } from '@icedesign/base';
+import { Input, Grid } from '@alifd/next';
 
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';

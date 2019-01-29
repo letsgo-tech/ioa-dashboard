@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Feedback, Select, Table } from '@icedesign/base';
+import { Button, Input, Overlay, Loading, Message, Select, Table } from '@alifd/next';
 import BalloonConfirm from '@icedesign/balloon-confirm';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
@@ -80,7 +80,7 @@ export default class TargetList extends Component {
                     this.onCloseOverlay();
                 } catch (e) {
                     this.setState({ loading: false });
-                    Feedback.toast.error(e.message || '添加参数失败， 请稍后重试');
+                    Message.error('添加参数失败， 请稍后重试');
                 }
             }
         });
@@ -201,7 +201,7 @@ export default class TargetList extends Component {
                             currentApi.targets.splice(index, 1);
                             await apiStore.putApi(currentApi);
                         } catch (e) {
-                            Feedback.toast.error(e.message || '删除失败， 请稍后重试');
+                            Message.error('删除失败， 请稍后重试');
                         }
                     }}
                     title={`删除 ${scheme}${host}${port && ':'}${port}${path}`}
@@ -222,11 +222,11 @@ export default class TargetList extends Component {
         const { currentApi, targets } = this.props.stores.apiStore;
 
         return (
-            <div>
+            <div style={{ marginLeft: '16px' }}>
                 <div style={styles.secTitle}>
                     <h5 style={styles.infoColumnTitle}>转发目标</h5>
                     <Button
-                        size="small"
+                        size="medium"
                         type="primary"
                         onClick={() => {
                             this.setState({ visible: true, isCreating: true, isPuting: false, value: { method: currentApi.method, scheme: 'http://', host: '', port: '', path: '/' } });

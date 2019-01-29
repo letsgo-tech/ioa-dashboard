@@ -1,8 +1,8 @@
 {
-  "name": "@icedesign/operation-admin-scaffold",
+  "name": "@icedesign/ioa-admin",
   "version": "1.0.0",
-  "description": "该模板适用于设备管理类的后台系统，内置列表管理页、表单新增编辑页及表单查看页，这三个页面可形成一个闭环",
-  "author": "ice-admin@alibaba-inc.com",
+  "description": "接口管理",
+  "author": "@ss9501",
   "files": [
     "src/",
     "build/",
@@ -14,8 +14,8 @@
     ".eslintrc"
   ],
   "dependencies": {
+    "@alifd/next": "^1.12.2",
     "@icedesign/balloon-confirm": "^0.1.4",
-    "@icedesign/base": "^0.1.5-1",
     "@icedesign/container": "^0.1.1",
     "@icedesign/form-binder": "^1.0.2",
     "@icedesign/foundation-symbol": "^0.1.0",
@@ -23,7 +23,7 @@
     "@icedesign/label": "^0.1.5",
     "@icedesign/layout": "^0.1.0",
     "@icedesign/menu": "^0.1.0",
-    "@icedesign/skin": "^0.1.0",
+    "@icedesign/theme": "^0.1.2",
     "axios": "^0.18.0",
     "bizcharts": "3.1.3",
     "classnames": "^2.2.5",
@@ -32,8 +32,8 @@
     "mobx-react": "^5.4.3",
     "mobx-react-router": "^4.0.5",
     "prop-types": "^15.5.8",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
     "react-router-dom": "^4.3.1"
   },
   "devDependencies": {
@@ -44,7 +44,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.5.1",
-    "ice-scripts": "^1.6.0-next.3"
+    "ice-scripts": "^1.8.2"
   },
   "publishConfig": {
     "registry": "http://registry.npmjs.com",
@@ -56,7 +56,7 @@
     "lint": "eslint . --ext '.js,.jsx' --fix"
   },
   "buildConfig": {
-    "theme": "@icedesign/skin",
+    "theme": "@icedesign/theme",
     "entry": "src/index.js",
     "localization": false,
     "output": {
@@ -69,9 +69,9 @@
   "scaffoldConfig": {
     "builder": "ice-scripts",
     "name": "ice-operation-admin",
-    "title": "设备管理系统",
+    "title": "接口管理系统",
     "categories": [
-      "行业领域"
+      "后台"
     ],
     "screenshot": "https://img.alicdn.com/tfs/TB1lRfswVYqK1RjSZLeXXbXppXa-2872-1580.png"
   },
