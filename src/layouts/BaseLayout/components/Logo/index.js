@@ -5,7 +5,7 @@ export default class Logo extends Component {
     render() {
         return (
             <Link to="/" style={styles.logo}>
-                <span style={styles.brand}>KUIPMAKE</span>
+                <span style={styles.brand}>IOA</span>
             </Link>
         );
     }

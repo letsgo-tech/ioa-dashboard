@@ -4,8 +4,8 @@ const LoginIntro = () => {
     return (
         <div style={styles.container}>
             <div style={styles.content}>
-                <div style={styles.title}>KUIPMAKE</div>
-                <p style={styles.description}>API管理平台</p>
+                <div style={styles.title}>IOA</div>
+                <p style={styles.description}>dashboard</p>
             </div>
         </div>
     );

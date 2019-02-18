@@ -1,4 +1,4 @@
-# ice-operation-admin
+# IOA-dashboard
 
 ## 使用
 
@@ -21,7 +21,3 @@
 - 主色：#447eff
 - 功能主色：#58ca9a
 - 字体颜色：#333、#666
-
-## 效果图
-
-![screenshot](https://img.alicdn.com/tfs/TB1Uf2jwMHqK1RjSZFPXXcwapXa-2872-1580.png)
