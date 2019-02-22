@@ -1,7 +1,5 @@
-/**
- * 通过 JavaScript 的形式模拟静态接口
- * 这样做的目的是可以直接打包出来部署在线上而不依赖后端或者 mock 接口
- */
+import request from '../util/request';
+
 export async function getUserProfile() {
     const data = await {
         name: '淘小宝',
@@ -48,11 +46,6 @@ export async function postUserRegister() {
     return { data };
 }
 
-export async function postUserLogout() {
-    const data = await {
-        status: 200,
-        statusText: 'ok',
-        currentAuthority: 'guest',
-    };
-    return { data };
+export async function logout() {
+    return true;
 }

@@ -1,6 +1,7 @@
 import { Message } from '@alifd/next';
 import { observable, action } from 'mobx';
-import { login, postUserLogout, postUserRegister } from '../api/user';
+import { login, logout, postUserRegister } from '../api/user';
+import { setServerAddress, clearServerAddress } from '../api/index.js';
 
 export default class UserStore {
     @observable token = '';
@@ -22,6 +23,16 @@ export default class UserStore {
     clearToken() {
         this.token = '';
         localStorage.removeItem('authToken');
+    }
+
+    setServerAddress(serverAddress = '') {
+        localStorage.setItem('serverAddress', serverAddress);
+        setServerAddress(serverAddress);
+    }
+
+    clearServerAddress() {
+        localStorage.removeItem('serverAddress');
+        clearServerAddress();
     }
 
     @action
@@ -47,6 +58,8 @@ export default class UserStore {
     userLogout = async () => {
         try {
             this.clearToken();
+            this.clearServerAddress();
+            await logout();
             Message.success('已登出');
         } catch (error) {
             throw error;

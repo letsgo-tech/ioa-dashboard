@@ -44,7 +44,12 @@ class Header extends React.Component {
                 style={{ width: '80px' }}
             >
                 <div className="ice-header-personal-menu">
-                    <Link to="/user/login">退出</Link>
+                    <a onClick={() => {
+                        this.props.handleLogout();
+                    }}
+                    >
+                    退出
+                    </a>
                 </div>
             </Balloon>
         );

@@ -1,7 +1,7 @@
 /* eslint react/no-string-refs:0 */
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
-import { Input, Button, Checkbox, Grid, Message } from '@alifd/next';
+import { Input, Button, Checkbox, Grid, Message, Icon } from '@alifd/next';
 import {
     FormBinderWrapper as IceFormBinderWrapper,
     FormBinder as IceFormBinder,
@@ -9,6 +9,9 @@ import {
 } from '@icedesign/form-binder';
 import IceIcon from '@icedesign/icon';
 import { inject, observer } from 'mobx-react';
+import { computed } from 'mobx';
+
+import request from '../../util/request';
 
 const { Row, Col } = Grid;
 
@@ -30,7 +33,13 @@ class UserLogin extends Component {
                 password: '',
                 checkbox: false,
             },
+            serverAddress: '',
         };
+    }
+
+    @computed
+    get userStore() {
+        return this.props.stores.userStore;
     }
 
     formChange = (value) => {
@@ -46,7 +55,9 @@ class UserLogin extends Component {
                 console.log('errors', errors);
                 return;
             }
-            await this.props.stores.userStore.userLogin(values);
+
+            this.userStore.setServerAddress(this.state.serverAddress);
+            await this.userStore.userLogin(values);
             this.props.history.push('/');
         });
     };
@@ -62,7 +73,17 @@ class UserLogin extends Component {
                 >
                     <div style={styles.formItems}>
                         <div style={styles.formItem}>
-                            <IceIcon type="person" size="small" style={styles.inputIcon} />
+                            <Icon type="warning" size="small" style={styles.inputIcon} />
+                            <Input
+                                size="large"
+                                maxLength={100}
+                                placeholder="服务器地址"
+                                style={styles.inputCol}
+                                onChange={val => this.setState({ serverAddress: val })}
+                            />
+                        </div>
+                        <div style={styles.formItem}>
+                            <Icon type="account" size="small" style={styles.inputIcon} />
                             <IceFormBinder name="username" required message="必填">
                                 <Input
                                     size="large"
@@ -99,6 +120,7 @@ class UserLogin extends Component {
                                 size="large"
                                 onClick={this.handleSubmit}
                                 style={styles.submitBtn}
+                                disabled={!this.state.serverAddress}
                             >
                                 登 录
                             </Button>

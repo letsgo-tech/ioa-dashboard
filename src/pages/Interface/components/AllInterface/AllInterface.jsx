@@ -18,7 +18,7 @@ const methods = [
     { label: 'HEAD', value: 'head' },
     { label: 'CONNECT', value: 'connect' },
 ];
-console.log(Message.success)
+
 @inject('stores')
 @observer
 export default class AllInterface extends Component {
