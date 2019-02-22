@@ -3,7 +3,7 @@ import React from 'react';
 export default () => {
     return (
         <div style={styles.footer}>
-            <div style={styles.copyright}>KUIPMAKE © 2018</div>
+            <div style={styles.copyright}>IOA © 2018</div>
         </div>
     );
 };

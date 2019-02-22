@@ -27,7 +27,7 @@ class Header extends React.Component {
                     className="ice-header-user-avatar"
                 />
                 <span className="ice-header-user-name">
-                    {profile.name || 'kuip'}
+                    {profile.name || 'ioa'}
                     <Icon className="ice-header-arrow" size="xs" type="arrow-down" />
                 </span>
             </div>
