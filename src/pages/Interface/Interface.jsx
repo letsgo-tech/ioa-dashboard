@@ -4,7 +4,6 @@ import { withRouter } from 'react-router';
 import IceContainer from '@icedesign/container';
 import InterfaceTagList from './components/InterfaceTagList';
 import AllInterface from './components/AllInterface';
-import InterfaceGroupDetail from './components/InterfaceGroupDetail';
 import InterfaceDetail from './components/InterfaceDetail';
 import './Interface.scss';
 
@@ -20,15 +19,11 @@ export default class Interface extends Component {
     render() {
         return (
             <div className="interface-page">
-                <InterfaceTagList
-                    onDeleteTag={() => this.props.history.replace('/')}
-                    onDeleteApi={tagId => this.props.history.replace(`/interface/group/${tagId}`)}
-                />
+                <InterfaceTagList />
                 <IceContainer style={{ flex: 1 }}>
                     <Switch>
                         <Route path="/interface" exact component={AllInterface} />
-                        <Route path="/interface/group/:id" exact component={InterfaceGroupDetail} />
-                        <Route path="/interface/api/:id" exact component={InterfaceDetail} />
+                        <Route path="/interface/:id" exact component={InterfaceDetail} />
                     </Switch>
                 </IceContainer>
             </div>

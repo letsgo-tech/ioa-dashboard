@@ -25,11 +25,6 @@ export async function deletePlugin(id) {
     return res;
 }
 
-export async function patchPlugin(id, params) {
-    const res = await request.patch(`/plugins/${id}`, params);
-    return res;
-}
-
 export async function putPlugin(id, params) {
     const res = await request.put(`/plugins/${id}`, params);
     return res;

@@ -41,6 +41,12 @@ export default class EditPluginConfigOverlay extends Component {
         const { validateFields } = this.refs.form;
 
         validateFields(async (errors, values) => {
+            Object.keys(values).forEach(key => {
+                if (typeof values[key] === 'number') {
+                    values[key] = values[key].toString();
+                }
+            });
+
             if (!errors) {
                 this.props.submit(values);
             } else {
@@ -62,6 +68,7 @@ export default class EditPluginConfigOverlay extends Component {
                 align="cc cc"
                 canCloseByOutSideClick={false}
                 onRequestClose={() => this.onClose()}
+                offset={[0, -200]}
             >
                 <div className="overlay-form-container">
                     {
@@ -69,7 +76,7 @@ export default class EditPluginConfigOverlay extends Component {
                         this.currentPlugin.configTpl.length ?
                             <div>
                                 <h4 style={styles.header}>
-                                    更改配置 ({this.props.name})
+                                    Modify config ({this.props.name})
                                 </h4>
                                 <Loading shape="flower" tip="loading..." color="#666" visible={this.state.loading}>
                                     <FormBinderWrapper
@@ -83,17 +90,17 @@ export default class EditPluginConfigOverlay extends Component {
                                                     <div key={index}>
                                                         <div className="form-item">
                                                             <span className={`form-item-label ${item.required && 'required'}`}>{item.name}：</span>
-                                                            <FormBinder name={`${item.name}`} required={item.required} message={`请输入${item.name}`}>
+                                                            <FormBinder name={`${item.name}`} required={item.required} message={`please fill up ${item.name}`}>
                                                                 {
                                                                     item.fieldType === 'string' ?
                                                                         <Input
                                                                             htmlType="string"
-                                                                            size="large"
+                                                                            size="medium"
                                                                             placeholder={`${item.name}`}
                                                                         /> :
                                                                         <Input
                                                                             htmlType="number"
-                                                                            size="large"
+                                                                            size="medium"
                                                                             min={0}
                                                                             placeholder={`${item.name}`}
                                                                         />
@@ -114,16 +121,16 @@ export default class EditPluginConfigOverlay extends Component {
                                     </FormBinderWrapper>
                                     <div style={{ textAlign: 'end', padding: '10px 0' }}>
                                         <Button type="normal" onClick={() => this.onClose()} style={{ marginRight: '10px' }}>
-                                            取 消
+                                            cancel
                                         </Button>
                                         <Button type="primary" onClick={() => this.validateFields()} loading={this.props.updating}>
-                                            提 交
+                                            submit
                                         </Button>
                                     </div>
                                 </Loading>
                             </div> :
                             <div style={{ padding: '10px' }}>
-                                <Icon type="loading" /> 正在获取配置模板 。。。
+                                <Icon type="loading" /> loading template 。。。
                             </div>
                     }
                 </div>

@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
-import { Button, Input, Overlay, Loading, Message, Select, Table } from '@alifd/next';
+import { Button, Input, Overlay, Loading, Message, Select, Table, Icon } from '@alifd/next';
 import BalloonConfirm from '@icedesign/balloon-confirm';
 import { FormBinderWrapper, FormBinder, FormError } from '@icedesign/form-binder';
 
 import { inject, observer } from 'mobx-react';
 
 const methods = [
+    { label: ' original ', value: '' },
     { label: 'GET', value: 'get' },
     { label: 'POST', value: 'post' },
     { label: 'PUT', value: 'put' },
     { label: 'DELETE', value: 'delete' },
     { label: 'PATCH', value: 'patch' },
-    { label: 'OPTION', value: 'option' },
-    { label: 'HEAD', value: 'head' },
-    { label: 'CONNECT', value: 'connect' },
 ];
 
 const schemes = [
@@ -80,7 +78,7 @@ export default class TargetList extends Component {
                     this.onCloseOverlay();
                 } catch (e) {
                     this.setState({ loading: false });
-                    Message.error('添加参数失败， 请稍后重试');
+                    Message.error('add failed, please try again later');
                 }
             }
         });
@@ -99,27 +97,17 @@ export default class TargetList extends Component {
             >
                 <Loading shape="flower" tip="creating..." color="#666" visible={this.state.loading}>
                     <div className="overlay-form-container">
-                        <h4 style={{ paddingTop: '10px' }}>添加转发目标</h4>
+                        <h4 style={{ paddingTop: '10px' }}>Add target</h4>
                         <FormBinderWrapper
                             value={this.state.value}
                             onChange={value => this.setState({ value })}
                             ref="form"
                         >
                             <div>
-                                <div className="form-item">
-                                    <span className="form-item-label required">serverMethod：</span>
-                                    <FormBinder name="method" required message="请选择请求协议">
-                                        <Select
-                                            style={{ height: '32px', lineHeight: '32px', width: '120px' }}
-                                            dataSource={methods}
-                                        />
-                                    </FormBinder>
-                                </div>
-
                                 <div>
                                     <div className="form-item">
                                         <span className="form-item-label required">serverScheme：</span>
-                                        <FormBinder name="scheme" required message="请选择请求协议">
+                                        <FormBinder name="scheme" required message="choose request protocol">
                                             <Select
                                                 style={{ height: '32px', lineHeight: '32px', width: '120px' }}
                                                 dataSource={schemes}
@@ -132,9 +120,9 @@ export default class TargetList extends Component {
                                 <div>
                                     <div className="form-item">
                                         <span className="form-item-label required">serverHost：</span>
-                                        <FormBinder name="host" required message="请填写host地址">
+                                        <FormBinder name="host" required message="please fill up host address">
                                             <Input
-                                                size="large"
+                                                size="medium"
                                                 placeholder="host地址"
                                             />
                                         </FormBinder>
@@ -146,8 +134,19 @@ export default class TargetList extends Component {
                                     <span className="form-item-label">serverPort：</span>
                                     <FormBinder name="port">
                                         <Input
-                                            size="large"
+                                            size="medium"
                                             placeholder="80"
+                                        />
+                                    </FormBinder>
+                                </div>
+
+                                <div className="form-item">
+                                    <span className="form-item-label">serverMethod：</span>
+                                    <FormBinder name="method">
+                                        <Select
+                                            style={{ height: '32px', lineHeight: '32px', width: '200px' }}
+                                            dataSource={methods}
+                                            placeholder="original method if empty"
                                         />
                                     </FormBinder>
                                 </div>
@@ -155,9 +154,9 @@ export default class TargetList extends Component {
                                 <div>
                                     <div className="form-item">
                                         <span className="form-item-label required">serverPath：</span>
-                                        <FormBinder name="path" required message="请填写路径">
+                                        <FormBinder name="path" required message="please fill up path">
                                             <Input
-                                                size="large"
+                                                size="medium"
                                                 placeholder="/path"
                                             />
                                         </FormBinder>
@@ -188,24 +187,26 @@ export default class TargetList extends Component {
 
         return (
             <span>
-                <a onClick={() => {
-                    this.setState({ visible: true, isCreating: false, isPuting: true, value: { method, scheme, host, port, path }, currentTargetIndex: index });
-                }}
+                <a
+                    onClick={() => {
+                        this.setState({ visible: true, isCreating: false, isPuting: true, value: { method, scheme, host, port, path }, currentTargetIndex: index });
+                    }}
+                    style={{ cursor: 'pointer' }}
                 >
-                    编辑
+                    <Icon type="edit" size="small" />
                 </a>
-                <span> | </span>
+                <span> &nbsp;&nbsp;| &nbsp;&nbsp;</span>
                 <BalloonConfirm
                     onConfirm={async () => {
                         try {
                             currentApi.targets.splice(index, 1);
                             await apiStore.putApi(currentApi);
                         } catch (e) {
-                            Message.error('删除失败， 请稍后重试');
+                            Message.error('delete failed, please try again later');
                         }
                     }}
-                    title={`删除 ${scheme}${host}${port && ':'}${port}${path}`}
-                ><span>删除</span>
+                    title={`delete ${scheme}${host}${port && ':'}${port}${path}`}
+                ><a style={{ cursor: 'pointer' }}><Icon type="ashbin" size="small" /></a>
                 </BalloonConfirm>
             </span>
         );
@@ -224,7 +225,7 @@ export default class TargetList extends Component {
         return (
             <div style={{ marginLeft: '16px' }}>
                 <div style={styles.secTitle}>
-                    <h5 style={styles.infoColumnTitle}>转发目标</h5>
+                    <h5 style={styles.infoColumnTitle}>Forwarding Target</h5>
                     <Button
                         size="medium"
                         type="primary"
@@ -232,18 +233,18 @@ export default class TargetList extends Component {
                             this.setState({ visible: true, isCreating: true, isPuting: false, value: { method: currentApi.method, scheme: 'http://', host: '', port: '', path: '/' } });
                         }}
                     >
-                        新增
+                        Add
                     </Button>
                 </div>
                 <div>
                     {
                         targets.length ?
                             <Table dataSource={targets.slice()}>
-                                <Table.Column title="路径" cell={this.renderFullPath} />
-                                <Table.Column title="请求方法" dataIndex="method" />
-                                <Table.Column title="操作" cell={this.renderOperateCell} />
+                                <Table.Column title="path" cell={this.renderFullPath} />
+                                <Table.Column title="method" dataIndex="method" />
+                                <Table.Column title="operation" cell={this.renderOperateCell} width="140px" />
                             </Table> :
-                            '无'
+                            <div style={styles.pluginCol}>empty</div>
                     }
                 </div>
                 { this.renderOverlay() }
@@ -262,5 +263,12 @@ const styles = {
         margin: '20px 0',
         paddingLeft: '10px',
         borderLeft: '3px solid #3080fe',
+        fontWeight: 500,
+    },
+    pluginCol: {
+        alignItems: 'center',
+        display: 'flex',
+        borderBottom: '1px solid #EEEFF3',
+        padding: '12px',
     },
 };

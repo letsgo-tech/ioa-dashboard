@@ -14,6 +14,8 @@ export default class UserStore {
 
     constructor() {
         this.fetchToken();
+        const serverAddress = localStorage.getItem('serverAddress');
+        this.setServerAddress(serverAddress);
     }
 
     fetchToken() {

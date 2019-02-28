@@ -8,15 +8,13 @@ import { Link } from 'react-router-dom';
 
 import './AllInterface.scss';
 
-const methods = [
+const methodSource = [
+    { label: '*', value: 'all' },
     { label: 'GET', value: 'get' },
     { label: 'POST', value: 'post' },
     { label: 'PUT', value: 'put' },
     { label: 'DELETE', value: 'delete' },
     { label: 'PATCH', value: 'patch' },
-    { label: 'OPTION', value: 'option' },
-    { label: 'HEAD', value: 'head' },
-    { label: 'CONNECT', value: 'connect' },
 ];
 
 @inject('stores')
@@ -35,7 +33,7 @@ export default class AllInterface extends Component {
             isCreating: false,
             tags: [],
             name: '',
-            method: 'get',
+            methods: [],
             path: '',
         };
     }
@@ -57,19 +55,19 @@ export default class AllInterface extends Component {
 
     submit = async () => {
         const { apiStore } = this.props.stores;
-        const { name, method, path, tags } = this.state;
-        const values = { name, method, path, tags };
+        const { name, methods, path, tags } = this.state;
+        const values = { name, methods, path, tags };
 
         try {
             this.setState({ isCreating: true });
             await apiStore.createApi(values);
             this.setState({ isCreating: false, visible: false });
-            Message.success('添加接口成功');
-            this.setState({ name: '', method: 'get', path: '', tags: [] });
+            Message.success('add api success');
+            this.setState({ name: '', methods: [], path: '', tags: [] });
             await apiStore.listApisWithTag();
         } catch (e) {
             this.setState({ isCreating: false });
-            Message.error(e.message || '添加接口失败， 请稍后重试');
+            Message.error(e.message || 'add api failed, please try again later');
         }
     }
 
@@ -78,7 +76,7 @@ export default class AllInterface extends Component {
         return (
             <Link
                 key={index}
-                to={`/interface/api/${id}`}
+                to={`/interface/${id}`}
                 style={{ fontSize: '16px' }}
             > {name}
             </Link>
@@ -86,11 +84,15 @@ export default class AllInterface extends Component {
     }
 
     methodCellRender = (val, index, record) => {
-        const { method, path } = record;
+        const { methods } = record;
         return (
             <div>
-                <Tag type="primary" size="small" className={`${method.toLowerCase()}-tag`} style={{ color: '#666' }}>{ method }</Tag>
-                <span style={{ fontSize: '14px' }}>  { path }</span>
+                {
+                    methods instanceof Array ?
+                        methods.map((method, idx) => {
+                            return <Tag key={idx} type="primary" size="small" className={`${method.toLowerCase()}-tag`} style={{ color: '#666', marginLeft: '4px' }}>{ method }</Tag>;
+                        }) : null
+                }
             </div>
         );
     }
@@ -108,42 +110,47 @@ export default class AllInterface extends Component {
             >
                 <Loading shape="flower" tip="creating..." color="#666" visible={this.state.isCreating}>
                     <div className="overlay-form-container">
-                        <h4 style={{ paddingTop: '10px' }}>添加接口</h4>
+                        <h4 style={{ paddingTop: '10px' }}>Add Api</h4>
                         <div>
                             <div className="form-item">
-                                <span style={styles.formItemLabel}>名称：</span>
+                                <span style={styles.formItemLabel}>name：</span>
                                 <Input
                                     hasClear={true}
                                     style={styles.formInput}
                                     value={this.state.name}
-                                    placeholder="接口名称"
+                                    placeholder="name"
                                     onChange={name => this.setState({ name })}
                                 />
                             </div>
                             <div className="form-item">
-                                <span style={styles.formItemLabel}>路径：</span>
-                                <Input.Group
-                                    addonBefore={
-                                        <Select
-                                            dataSource={methods}
-                                            placeholder="方法"
-                                            value={this.state.method}
-                                            onChange={method => this.setState({ method })}
-                                        />
-                                    }
-                                >
-                                    <Input
-                                        hasClear={true}
-                                        style={{ width: '100%' }}
-                                        placeholder="/path"
-                                        aria-label="please input"
-                                        value={this.state.path}
-                                        onChange={path => this.setState({ path })}
-                                    />
-                                </Input.Group>
+                                <span style={styles.formItemLabel}>method：</span>
+                                <Select
+                                    arial-label="method"
+                                    mode="tag"
+                                    onChange={m => {
+                                        if (m.includes('all')) {
+                                            m = ['get', 'post', 'put', 'delete', 'patch'];
+                                        }
+                                        this.setState({ methods: m });
+                                    }}
+                                    style={{ flex: 1 }}
+                                    value={this.state.methods}
+                                    dataSource={methodSource}
+                                    placeholder="select method"
+                                />
                             </div>
                             <div className="form-item">
-                                <span style={styles.formItemLabel}>标签：</span>
+                                <span style={styles.formItemLabel}>path：</span>
+                                <Input
+                                    hasClear={true}
+                                    placeholder="/path"
+                                    aria-label="please input"
+                                    value={this.state.path}
+                                    onChange={path => this.setState({ path })}
+                                />
+                            </div>
+                            <div className="form-item">
+                                <span style={styles.formItemLabel}>tag：</span>
                                 <Select
                                     arial-label="tag"
                                     mode="tag"
@@ -151,16 +158,17 @@ export default class AllInterface extends Component {
                                     style={{ flex: 1 }}
                                     value={this.state.tags}
                                     dataSource={this.tagSource}
+                                    placeholder="select or input"
                                 />
                             </div>
                         </div>
 
                         <div style={{ textAlign: 'end', padding: '10px 0' }}>
                             <Button type="normal" onClick={() => this.setState({ visible: false })} style={{ marginRight: '10px' }}>
-                                取 消
+                                cancel
                             </Button>
                             <Button type="primary" onClick={() => this.submit()} disabled={!(this.state.name || this.state.path)}>
-                                提 交
+                                submit
                             </Button>
                         </div>
                     </div>
@@ -174,13 +182,14 @@ export default class AllInterface extends Component {
         return (
             <div>
                 <div style={styles.header}>
-                    <h2>接口列表  { apis instanceof Array ? `接口数：${apis.length} 个` : '' }</h2>
-                    <Button type="primary" onClick={() => this.setState({ visible: true })}>添加接口</Button>
+                    <h2>ALL { apis instanceof Array ? ` counts：${apis.length} ` : '' }</h2>
+                    <Button type="primary" onClick={() => this.setState({ visible: true })}>Add Api</Button>
                     { this.renderOverlay() }
                 </div>
                 <Table dataSource={apis}>
-                    <Table.Column title="接口名称" cell={this.nameCellRender} />
-                    <Table.Column title="接口路径" cell={this.methodCellRender} />
+                    <Table.Column title="name" cell={this.nameCellRender} />
+                    <Table.Column title="path" dataIndex="path" />
+                    <Table.Column title="method" cell={this.methodCellRender} />
                 </Table>
             </div>
         );
@@ -197,7 +206,8 @@ const styles = {
     },
     formItemLabel: {
         display: 'inline-block',
-        minWidth: '50px',
-        width: '50px',
+        minWidth: '60px',
+        width: '60px',
+        textAlign: 'end',
     },
 };

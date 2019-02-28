@@ -96,7 +96,7 @@ export default class ApiPluginList extends Component {
             this.setState({ updating: false, isAdding: false });
         } catch (e) {
             this.setState({ updating: false });
-            Message.error('添加插件失败，请稍后重试');
+            Message.error('add plugin failed, please try again later');
             throw e;
         }
     }
@@ -112,7 +112,7 @@ export default class ApiPluginList extends Component {
         return (
             <div style={{ marginLeft: '16px' }}>
                 <div style={styles.secTitle}>
-                    <h5 style={styles.infoColumnTitle}>插件</h5>
+                    <h5 style={styles.infoColumnTitle}>Plugin</h5>
                     <Button
                         size="medium"
                         type="primary"
@@ -120,7 +120,7 @@ export default class ApiPluginList extends Component {
                             this.setState({ isAdding: true });
                         }}
                     >
-                        新增
+                        Add
                     </Button>
                     <AddPluginOverlay
                         visible={this.state.isAdding}
@@ -134,11 +134,11 @@ export default class ApiPluginList extends Component {
                         this.apiPlugins.length ?
                             <div>
                                 <Row>
-                                    <Col span="2" style={styles.pluginCol}>次序</Col>
-                                    <Col span="6" style={styles.pluginCol}>名称</Col>
-                                    <Col span="8" style={styles.pluginCol}>配置</Col>
-                                    <Col span="4" style={styles.pluginCol}>排序</Col>
-                                    <Col span="4" style={styles.pluginCol}>操作</Col>
+                                    <Col span="2" style={styles.pluginCol}>order</Col>
+                                    <Col span="6" style={styles.pluginCol}>name</Col>
+                                    <Col span="8" style={styles.pluginCol}>config</Col>
+                                    <Col span="4" style={styles.pluginCol}>reorder</Col>
+                                    <Col span="4" style={styles.pluginCol}>operation</Col>
                                 </Row>
                                 {
                                     this.apiPlugins.slice().map((item, index) => {
@@ -148,14 +148,16 @@ export default class ApiPluginList extends Component {
                                                     <Col span="2" style={styles.pluginCol}>{index + 1}</Col>
                                                     <Col span="6" style={styles.pluginCol}>{item.name}</Col>
                                                     <Col span="8" style={styles.pluginCol}>
-                                                        {
-                                                            item.config ?
-                                                                Object.keys(item.config).map((key, idx) => (
-                                                                    <span key={idx}>
-                                                                        <IceLabel style={{ margin: '4px' }} inverse={false} status="primary">{key} : {item.config[key]}</IceLabel>
-                                                                    </span>
-                                                                )) : '无'
-                                                        }
+                                                        <div>
+                                                            {
+                                                                item.config ?
+                                                                    Object.keys(item.config).map((key, idx) => (
+                                                                        <span key={idx}>
+                                                                            <IceLabel style={{ margin: '4px' }} inverse={false} status="primary">{key} : {item.config[key]}</IceLabel>
+                                                                        </span>
+                                                                    )) : '无'
+                                                            }
+                                                        </div>
                                                     </Col>
                                                     <Col span="4" style={styles.pluginCol}>
                                                         <span>
@@ -186,14 +188,14 @@ export default class ApiPluginList extends Component {
                                                                 this.setState({ isEditing: true, selectedIndex: index, selectedName: plugin.name, selectedValue: Object.assign({}, plugin.config) });
                                                             }}
                                                             >
-                                                                编辑
+                                                                <Icon type="edit" size="small" />
                                                             </a>
-                                                            <span> | </span>
+                                                            <span> &nbsp;&nbsp;| &nbsp;&nbsp;</span>
                                                             <BalloonConfirm
                                                                 onConfirm={() => this.deletePlugin(index)}
-                                                                title={`删除 ${item.name}`}
+                                                                title={`Delete ${item.name}`}
                                                             >
-                                                                <span>删除</span>
+                                                                <span><Icon type="ashbin" size="small" /></span>
                                                             </BalloonConfirm>
                                                         </span>
                                                     </Col>
@@ -211,7 +213,7 @@ export default class ApiPluginList extends Component {
                                     submit={config => this.updatePluginConfig(config)}
                                 />
                             </div> :
-                            <div style={styles.pluginCol}>无</div>
+                            <div style={styles.pluginCol}>empty</div>
                     }
                 </div>
             </div>
@@ -229,6 +231,7 @@ const styles = {
         margin: '20px 0',
         paddingLeft: '10px',
         borderLeft: '3px solid #3080fe',
+        fontWeight: 500,
     },
     pluginCol: {
         alignItems: 'center',

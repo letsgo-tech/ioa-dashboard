@@ -57,6 +57,12 @@ export default class AddPluginOverlay extends Component {
         const { currentPlugin } = this.state;
 
         validateFields(async (errors, values) => {
+            Object.keys(values).forEach(key => {
+                if (typeof values[key] === 'number') {
+                    values[key] = values[key].toString();
+                }
+            });
+
             if (!errors) {
                 const plugin = {
                     name: currentPlugin.name,
@@ -78,13 +84,14 @@ export default class AddPluginOverlay extends Component {
                 align="cc cc"
                 canCloseByOutSideClick={false}
                 onRequestClose={() => this.onClose()}
+                offset={[0, -200]}
             >
                 <div className="overlay-form-container">
                     <h4 style={styles.header}>
-                        添加插件
+                        Add Plugin
                     </h4>
                     <div className="form-item">
-                        <span className="form-item-label">选择插件：</span>
+                        <span className="form-item-label">select plugin：</span>
                         <Select
                             style={{ width: '200px' }}
                             onChange={val => this.onSelected(val)}
@@ -113,17 +120,17 @@ export default class AddPluginOverlay extends Component {
                                             <div key={index}>
                                                 <div className="form-item">
                                                     <span className={`form-item-label ${item.required && 'required'}`}>{item.name}：</span>
-                                                    <FormBinder name={`${item.name}`} required={item.required} message={`请输入${item.name}`}>
+                                                    <FormBinder name={`${item.name}`} required={item.required} message={`please fill ${item.name}`}>
                                                         {
                                                             item.fieldType === 'string' ?
                                                                 <Input
                                                                     htmlType="string"
-                                                                    size="large"
+                                                                    size="medium"
                                                                     placeholder={`${item.name}`}
                                                                 /> :
                                                                 <Input
                                                                     htmlType="number"
-                                                                    size="large"
+                                                                    size="medium"
                                                                     min={0}
                                                                     placeholder={`${item.name}`}
                                                                 />
@@ -146,10 +153,10 @@ export default class AddPluginOverlay extends Component {
                                 this.state.selectedName &&
                                 <div style={{ textAlign: 'end', padding: '10px 0' }}>
                                     <Button type="normal" onClick={() => this.onClose()} style={{ marginRight: '10px' }}>
-                                        取 消
+                                        cancel
                                     </Button>
                                     <Button type="primary" onClick={() => this.validateFields()} loading={this.props.updating}>
-                                        提 交
+                                        submit
                                     </Button>
                                 </div>
                             }

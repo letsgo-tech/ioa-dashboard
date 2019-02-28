@@ -6,14 +6,14 @@ import { Link } from 'react-router-dom';
 
 import { inject, observer } from 'mobx-react';
 import { computed } from 'mobx';
-import './InterfaceTagList.scss';
+import './index.scss';
 
 const { SubMenu, Item } = Menu;
 
 @inject('stores')
 @observer
-export default class InterfaceTagList extends Component {
-    static displayName = 'InterfaceTagList';
+export default class PolicyTip extends Component {
+    static displayName = 'PolicyTip';
 
     static propTypes = {};
 
@@ -105,7 +105,7 @@ export default class InterfaceTagList extends Component {
 
     render() {
         return (
-            <div className="tree-card-list" style={styles.InterfaceTagList}>
+            <div className="tree-card-list" style={styles.PolicyTip}>
                 <IceContainer>
                     <div style={styles.firstRow}>
                         <span>Tag List</span>
