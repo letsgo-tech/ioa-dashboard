@@ -85,7 +85,7 @@ export default class InterfaceTagList extends Component {
                                                 <Link
                                                     className={`api-item ${currentApiId === api.id && 'selected'}`}
                                                     key={index}
-                                                    to={`/interface/api/${api.id}`}
+                                                    to={`/interface/${api.id}`}
                                                 >
                                                     <span>
                                                         {api.name}
